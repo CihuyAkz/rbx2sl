@@ -1,0 +1,1008 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#100306" />
+  <title>RBX → Lua Converter</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #080406;
+      --surface: #10080b;
+      --surface-2: #190b10;
+      --surface-3: #251017;
+      --line: #3d1a24;
+      --text: #fff3f5;
+      --muted: #c2a8af;
+      --subtle: #86656d;
+      --purple: #ff4d61;
+      --purple-2: #d3223d;
+      --mint: #ff6577;
+      --yellow: #f8d878;
+      --red: #ff445d;
+      --radius: 18px;
+    }
+
+    * { box-sizing: border-box; }
+
+    html { min-height: 100%; background: var(--bg); }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--text);
+      background:
+        radial-gradient(ellipse at 12% -8%, rgba(220, 20, 60, .22), transparent 33rem),
+        radial-gradient(ellipse at 93% 12%, rgba(95, 8, 25, .22), transparent 28rem),
+        linear-gradient(135deg, #14050a 0%, #080406 52%, #030203 100%);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      letter-spacing: -0.01em;
+    }
+
+    button, input, textarea { font: inherit; }
+    button { cursor: pointer; }
+    button:focus-visible, textarea:focus-visible, input:focus-visible, .drop-zone:focus-visible {
+      outline: 2px solid var(--purple);
+      outline-offset: 3px;
+    }
+
+    .app-shell { width: min(1440px, 100%); margin: 0 auto; padding: 24px clamp(16px, 3vw, 42px) 34px; }
+    .topbar { display: flex; align-items: center; justify-content: space-between; gap: 18px; padding: 3px 0 28px; border-bottom: 1px solid rgba(194, 168, 175, .14); }
+    .brand { display: flex; align-items: center; gap: 12px; min-width: 0; }
+    .brand-mark { width: 42px; height: 42px; display: grid; place-items: center; border-radius: 13px; color: #fff; background: linear-gradient(145deg, #ff6477, #b5122f); box-shadow: 0 8px 24px rgba(220, 20, 60, .26); font-size: 18px; font-weight: 850; letter-spacing: -.08em; }
+    .brand-name { margin: 0; font-size: 16px; font-weight: 800; letter-spacing: -.035em; }
+    .brand-caption { margin-top: 3px; font-size: 11px; color: var(--muted); letter-spacing: .08em; text-transform: uppercase; }
+    .topbar-right { display: flex; align-items: center; gap: 9px; }
+    .pill { display: inline-flex; align-items: center; gap: 7px; padding: 8px 11px; color: #e2cbd1; background: rgba(255,255,255,.035); border: 1px solid var(--line); border-radius: 999px; font-size: 11px; font-weight: 650; white-space: nowrap; }
+    .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--mint); box-shadow: 0 0 10px rgba(255,80,100,.5); }
+
+    .hero { padding: 36px 0 26px; display: flex; align-items: end; justify-content: space-between; gap: 24px; }
+    .eyebrow { display: flex; align-items: center; gap: 9px; color: var(--mint); font-size: 11px; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; }
+    .eyebrow-line { width: 23px; height: 1px; background: var(--mint); }
+    h1 { margin: 13px 0 10px; font-size: clamp(31px, 4vw, 47px); line-height: 1.04; letter-spacing: -.065em; font-weight: 800; }
+    h1 .accent { color: var(--purple); }
+    .hero-copy { max-width: 620px; color: var(--muted); font-size: 14px; line-height: 1.75; margin: 0; }
+    .hero-note { color: var(--subtle); font-size: 11px; text-align: right; line-height: 1.65; max-width: 230px; }
+
+    .layout { display: grid; grid-template-columns: minmax(290px, .82fr) minmax(0, 1.5fr); gap: 18px; align-items: start; }
+    .panel { min-width: 0; overflow: hidden; background: rgba(18, 7, 10, .94); border: 1px solid var(--line); border-radius: var(--radius); box-shadow: 0 18px 50px rgba(0,0,0,.13); }
+    .panel-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 20px 21px 17px; border-bottom: 1px solid rgba(194,168,175,.13); }
+    .panel-title-wrap { display: flex; gap: 11px; align-items: center; min-width: 0; }
+    .step-number { width: 29px; height: 29px; display: grid; place-items: center; border-radius: 9px; color: var(--purple); background: rgba(255,77,97,.12); font-size: 12px; font-weight: 850; }
+    h2 { margin: 0; font-size: 14px; font-weight: 750; letter-spacing: -.02em; }
+    .panel-kicker { margin-top: 4px; color: var(--muted); font-size: 11px; }
+    .tiny-label { font-size: 10px; color: var(--subtle); font-weight: 750; letter-spacing: .08em; text-transform: uppercase; }
+    .panel-body { padding: 20px; }
+
+    .drop-zone { display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; min-height: 246px; padding: 23px 15px; border: 1.5px dashed #58303a; border-radius: 15px; background: linear-gradient(160deg, rgba(255,65,85,.08), rgba(255,65,85,.02)); transition: border-color .18s ease, background .18s ease, transform .18s ease; cursor: pointer; }
+    .drop-zone.dragging { border-color: var(--mint); background: rgba(255,101,119,.08); transform: scale(1.01); }
+    .upload-icon { width: 51px; height: 51px; display: grid; place-items: center; margin-bottom: 15px; border-radius: 16px; border: 1px solid #58303a; background: #201016; color: var(--purple); }
+    .upload-icon svg { width: 24px; height: 24px; }
+    .drop-title { font-size: 14px; font-weight: 750; }
+    .drop-subtitle { margin-top: 7px; max-width: 235px; color: var(--muted); font-size: 11px; line-height: 1.7; }
+    .browse-button { margin-top: 16px; border: 1px solid #7d2435; background: rgba(255,77,97,.13); color: #ffd4da; border-radius: 9px; padding: 9px 13px; font-size: 11px; font-weight: 750; }
+    .browse-button:hover { background: rgba(255,77,97,.22); }
+    .supported { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px; margin-top: 16px; }
+    .file-tag { color: #d7c2c8; border: 1px solid #48232d; background: rgba(255,255,255,.025); padding: 5px 7px; border-radius: 6px; font-size: 9px; font-weight: 750; letter-spacing: .025em; }
+    #fileInput { display: none; }
+
+    .file-card { display: none; align-items: center; gap: 11px; margin-top: 13px; padding: 12px; background: var(--surface-2); border: 1px solid var(--line); border-radius: 12px; }
+    .file-card.visible { display: flex; }
+    .file-icon { display: grid; place-items: center; flex: 0 0 auto; width: 38px; height: 38px; border-radius: 10px; color: var(--mint); background: rgba(255,101,119,.09); font-size: 10px; font-weight: 850; }
+    .file-meta { min-width: 0; flex: 1; }
+    .file-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 12px; font-weight: 700; }
+    .file-size { margin-top: 4px; color: var(--muted); font-size: 10px; }
+    .remove-file { border: 0; background: transparent; color: var(--muted); padding: 7px; font-size: 17px; }
+
+    .notice { display: flex; gap: 10px; align-items: flex-start; margin-top: 14px; padding: 12px; border: 1px solid rgba(248,216,120,.2); border-radius: 11px; background: rgba(248,216,120,.045); color: #d4c9a4; font-size: 10px; line-height: 1.65; }
+    .notice svg { width: 15px; height: 15px; flex: 0 0 auto; margin-top: 1px; color: var(--yellow); }
+    .notice strong { color: #f6e7b5; }
+    .primary-button { display: flex; align-items: center; justify-content: center; gap: 9px; width: 100%; margin-top: 16px; padding: 12px 16px; border: 0; border-radius: 11px; background: linear-gradient(115deg, #ff586b, #bd1837); color: white; font-size: 12px; font-weight: 800; box-shadow: 0 8px 24px rgba(220,20,60,.25); transition: transform .15s ease, filter .15s ease; }
+    .primary-button:hover { filter: brightness(1.08); transform: translateY(-1px); }
+    .primary-button:active { transform: translateY(0); }
+    .primary-button svg { width: 15px; height: 15px; }
+    .secondary-row { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-top: 15px; }
+    .text-button { padding: 3px 0; border: 0; background: transparent; color: var(--muted); font-size: 10px; }
+    .text-button:hover { color: var(--text); }
+    .local-note { color: var(--subtle); font-size: 10px; }
+
+    .output-panel .panel-head { padding-bottom: 0; border-bottom: 0; align-items: flex-start; }
+    .output-actions { display: flex; gap: 7px; }
+    .icon-button { display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 8px 10px; border: 1px solid var(--line); border-radius: 9px; background: rgba(255,255,255,.025); color: #ead7dc; font-size: 10px; font-weight: 700; white-space: nowrap; }
+    .icon-button svg { width: 13px; height: 13px; }
+    .icon-button:hover { border-color: #7c3a47; background: rgba(255,255,255,.055); }
+    .tabs { display: flex; align-items: center; gap: 5px; margin: 18px 20px 0; padding: 5px; background: #0b0407; border: 1px solid #3d1a24; border-radius: 11px; }
+    .tab { flex: 1; min-width: 0; padding: 10px 8px; border: 0; border-radius: 7px; background: transparent; color: var(--muted); font-size: 11px; font-weight: 750; transition: color .15s ease, background .15s ease; }
+    .tab.active { background: #35141d; color: #ffe8ec; box-shadow: inset 0 0 0 1px rgba(255,77,97,.18); }
+    .tab .tab-dot { display: inline-block; width: 6px; height: 6px; border-radius: 50%; margin-right: 6px; background: var(--purple); vertical-align: 1px; }
+    .editor-meta { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 13px 20px 10px; color: var(--muted); font-size: 10px; }
+    .editor-language { display: inline-flex; align-items: center; gap: 7px; }
+    .language-mark { width: 17px; height: 17px; display: grid; place-items: center; border-radius: 5px; background: #391820; color: var(--mint); font-weight: 850; font-size: 9px; }
+    .editor-wrap { padding: 0 20px 20px; }
+    .editor { display: block; resize: vertical; width: 100%; min-height: 360px; max-height: 650px; border: 1px solid #3a1821; border-radius: 12px; padding: 17px 16px; background: #0a0407; color: #ead7dc; font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace; font-size: 11px; line-height: 1.85; tab-size: 2; white-space: pre; overflow: auto; }
+    .editor:focus { border-color: #a62a43; outline: none; }
+    .editor-foot { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 11px; color: var(--subtle); font-size: 10px; }
+    .status { display: inline-flex; align-items: center; gap: 6px; min-width: 0; }
+    .status-indicator { width: 6px; height: 6px; flex: 0 0 auto; border-radius: 50%; background: var(--subtle); }
+    .status.success .status-indicator { background: var(--mint); }
+    .status.error .status-indicator { background: var(--red); }
+    .status.warning .status-indicator { background: var(--yellow); }
+
+    .lower-grid { display: grid; grid-template-columns: 1.05fr 1fr 1fr; gap: 12px; margin-top: 18px; }
+    .mini-card { padding: 16px; border: 1px solid var(--line); border-radius: 14px; background: rgba(18,7,10,.7); }
+    .mini-top { display: flex; align-items: center; gap: 9px; }
+    .mini-icon { width: 31px; height: 31px; display: grid; place-items: center; border-radius: 9px; color: var(--mint); background: rgba(255,101,119,.08); }
+    .mini-icon.purple { color: var(--purple); background: rgba(255,77,97,.1); }
+    .mini-icon.yellow { color: var(--yellow); background: rgba(248,216,120,.09); }
+    .mini-icon svg { width: 16px; height: 16px; }
+    .mini-title { font-size: 11px; font-weight: 800; }
+    .mini-copy { margin-top: 10px; color: var(--muted); font-size: 10px; line-height: 1.75; }
+    .footer { display: flex; align-items: center; justify-content: space-between; gap: 15px; margin-top: 25px; padding-top: 17px; border-top: 1px solid rgba(194,168,175,.12); color: var(--subtle); font-size: 10px; }
+    .footer a { color: #ff8190; text-decoration: none; }
+    .footer a:hover { color: #ffd4da; text-decoration: underline; }
+    .toast { position: fixed; z-index: 10; right: 20px; bottom: 20px; max-width: min(370px, calc(100vw - 40px)); padding: 12px 15px; border: 1px solid #64303b; border-radius: 12px; background: #1b0b10; color: var(--text); font-size: 12px; line-height: 1.5; box-shadow: 0 14px 38px rgba(0,0,0,.35); opacity: 0; transform: translateY(10px); pointer-events: none; transition: .2s ease; }
+    .toast.show { opacity: 1; transform: translateY(0); }
+
+    @media (max-width: 900px) {
+      .layout { grid-template-columns: 1fr; }
+      .drop-zone { min-height: 210px; }
+      .hero-note { display: none; }
+      .lower-grid { grid-template-columns: 1fr 1fr; }
+      .mini-card:last-child { grid-column: 1 / -1; }
+    }
+    @media (max-width: 560px) {
+      .app-shell { padding: 16px 12px 25px; }
+      .topbar { padding-bottom: 18px; }
+      .brand-caption { font-size: 9px; }
+      .topbar-right .pill:first-child { display: none; }
+      .hero { padding: 28px 0 20px; }
+      h1 { font-size: 34px; }
+      .hero-copy { font-size: 12px; }
+      .panel-head { padding: 16px 15px 14px; }
+      .panel-body { padding: 15px; }
+      .output-panel .panel-head { flex-wrap: wrap; }
+      .output-actions { width: 100%; }
+      .output-actions .icon-button { flex: 1; }
+      .tabs { margin: 15px 14px 0; }
+      .tab { font-size: 10px; padding: 9px 4px; }
+      .editor-meta { padding: 12px 15px 9px; }
+      .editor-wrap { padding: 0 14px 15px; }
+      .editor { min-height: 320px; font-size: 10px; padding: 13px 11px; }
+      .lower-grid { grid-template-columns: 1fr; }
+      .mini-card:last-child { grid-column: auto; }
+      .footer { align-items: flex-start; flex-direction: column; }
+    }
+  </style>
+</head>
+<body>
+  <main class="app-shell">
+    <header class="topbar">
+      <div class="brand">
+        <div class="brand-mark">RBX</div>
+        <div>
+          <div class="brand-name">RBX <span style="color:var(--purple)">→</span> Lua</div>
+          <div class="brand-caption">Model conversion workspace</div>
+        </div>
+      </div>
+      <div class="topbar-right">
+        <span class="pill"><span class="dot"></span> Browser-based</span>
+        <span class="pill">Luau · Roblox</span>
+      </div>
+    </header>
+
+    <section class="hero">
+      <div>
+        <div class="eyebrow"><span class="eyebrow-line"></span> Developer Toolkit</div>
+        <h1>Model to <span class="accent">Lua.</span><br />Langsung di browser.</h1>
+        <p class="hero-copy">Konversi model Roblox biner atau XML menjadi kode Luau untuk membuat ulang Instance, tanpa mengambil Script/LocalScript/ModuleScript dari model.</p>
+      </div>
+      <div class="hero-note">FILE TETAP DI PERANGKATMU<br />Tidak diunggah ke server eksternal.</div>
+    </section>
+
+    <section class="layout" aria-label="Workspace converter">
+      <section class="panel">
+        <div class="panel-head">
+          <div class="panel-title-wrap">
+            <div class="step-number">01</div>
+            <div>
+              <h2>Import Model</h2>
+              <div class="panel-kicker">Pilih file yang ingin dikonversi</div>
+            </div>
+          </div>
+          <span class="tiny-label">INPUT</span>
+        </div>
+        <div class="panel-body">
+          <label class="drop-zone" id="dropZone" for="fileInput" tabindex="0" role="button" aria-label="Pilih file Roblox atau letakkan di sini">
+            <span class="upload-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V4m0 0L7.5 8.5M12 4l4.5 4.5"/><path d="M5 14.5v3.2A2.3 2.3 0 0 0 7.3 20h9.4a2.3 2.3 0 0 0 2.3-2.3v-3.2"/></svg>
+            </span>
+            <span class="drop-title">Drop file di sini</span>
+            <span class="drop-subtitle">atau pilih dari perangkat kamu untuk mulai membaca struktur model.</span>
+            <span class="browse-button">Pilih file</span>
+            <span class="supported"><span class="file-tag">.RBXM</span><span class="file-tag">.RBXL</span><span class="file-tag">.RBXMX</span><span class="file-tag">.RBXLX</span><span class="file-tag">.XML</span></span>
+          </label>
+          <input id="fileInput" type="file" accept=".rbxmx,.rbxlx,.rbxm,.rbxl,.xml,.txt" />
+          <div class="file-card" id="fileCard">
+            <div class="file-icon" id="fileExt">XML</div>
+            <div class="file-meta"><div class="file-name" id="fileName">—</div><div class="file-size" id="fileSize">—</div></div>
+            <button class="remove-file" id="removeFile" type="button" aria-label="Hapus file">×</button>
+          </div>
+          <div class="notice">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 9v4m0 4h.01"/><path d="M10.3 3.9 2.8 17a2 2 0 0 0 1.7 3h15a2 2 0 0 0 1.7-3l-7.5-13.1a2 2 0 0 0-3.4 0Z"/></svg>
+            <div><strong>Catatan format:</strong> Mendukung XML (.rbxmx/.rbxlx/.xml) dan biner (.rbxm/.rbxl). Parser biner dimuat dari CDN saat diperlukan; data model tetap diproses di browser dan tidak diunggah. Semua Script, LocalScript, dan ModuleScript dilewati.</div>
+          </div>
+          <button class="primary-button" type="button" id="convertBtn">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 7v5h-5M4 17v-5h5"/><path d="M5.6 9a7 7 0 0 1 11.8-2L20 12M4 12l2.6 5a7 7 0 0 0 11.8-2"/></svg>
+            Convert to Luau
+          </button>
+          <div class="secondary-row">
+            <button class="text-button" id="sampleBtn" type="button">Coba contoh model ↗</button>
+            <span class="local-note">Pemrosesan lokal</span>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel output-panel">
+        <div class="panel-head">
+          <div class="panel-title-wrap">
+            <div class="step-number">02</div>
+            <div>
+              <h2>Lua Output</h2>
+              <div class="panel-kicker">Lihat, edit, salin, atau download script</div>
+            </div>
+          </div>
+          <div class="output-actions">
+            <button class="icon-button" id="copyBtn" type="button" title="Salin kode saat ini">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h3"/></svg> Copy
+            </button>
+            <button class="icon-button" id="downloadBtn" type="button" title="Unduh kode saat ini sebagai file Lua">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12m0 0 4-4m-4 4-4-4"/><path d="M4 17v3h16v-3"/></svg> Download .lua
+            </button>
+          </div>
+        </div>
+        <div class="tabs" role="tablist" aria-label="Pilih jenis output">
+          <button class="tab" id="convertedTab" role="tab" aria-selected="false" type="button"><span class="tab-dot"></span>Converted Lua</button>
+          <button class="tab active" id="builtinTab" role="tab" aria-selected="true" type="button"><span class="tab-dot" style="background:var(--mint)"></span>Built-in Output</button>
+        </div>
+        <div class="editor-meta">
+          <div class="editor-language"><span class="language-mark">L</span><span id="editorLabel">studio_gui_visibility.lua</span></div>
+          <span id="lineCount">9 lines</span>
+        </div>
+        <div class="editor-wrap">
+          <textarea class="editor" id="codeEditor" spellcheck="false" autocapitalize="off" autocomplete="off" aria-label="Kode Luau output"></textarea>
+          <div class="editor-foot">
+            <span class="status warning" id="status"><span class="status-indicator"></span><span id="statusText">Built-in · LocalScript</span></span>
+            <span id="editorHint">Kode dapat diedit</span>
+          </div>
+        </div>
+      </section>
+    </section>
+
+    <section class="lower-grid" aria-label="Info converter">
+      <article class="mini-card">
+        <div class="mini-top"><span class="mini-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v18M3 12h18"/><circle cx="12" cy="12" r="9"/></svg></span><span class="mini-title">Hasil konversi</span></div>
+        <div class="mini-copy" id="conversionStats">Belum ada model diproses. Import file Roblox untuk melihat jumlah Instance yang dibaca.</div>
+      </article>
+      <article class="mini-card">
+        <div class="mini-top"><span class="mini-icon purple"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="3"/><path d="m9 9-2 3 2 3m6-6 2 3-2 3m-2-7-2 8"/></svg></span><span class="mini-title">Built-in script</span></div>
+        <div class="mini-copy">Script StudioGui kamu disimpan di tab Built-in Output. Karena menggunakan <code>Players.LocalPlayer</code>, jalankan sebagai <strong>LocalScript</strong> di lokasi client yang sesuai.</div>
+      </article>
+      <article class="mini-card">
+        <div class="mini-top"><span class="mini-icon yellow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 3.5 7.5v9L12 21l8.5-4.5v-9L12 3Z"/><path d="m3.8 7.6 8.2 4.5 8.2-4.5M12 12v9"/></svg></span><span class="mini-title">Target ServerScript</span></div>
+        <div class="mini-copy">Converted Lua membuat ulang objek model dengan <code>Instance.new</code>. Tempatkan script hasilnya pada <code>ServerScriptService</code> dan tinjau properti yang ditandai sebelum dijalankan.</div>
+      </article>
+    </section>
+
+    <footer class="footer">
+      <span>RBX → Lua Converter <span style="color:#75525a">·</span> Client-side file processing</span>
+      <span>Referensi: <a href="https://create.roblox.com/docs/scripting/locations" target="_blank" rel="noreferrer">Script locations</a> <span style="color:#75525a">·</span> <a href="https://github.com/CihuyAkz/rbxm2sl" target="_blank" rel="noreferrer">RBXM parser reference</a> <span style="color:#75525a">·</span> <a href="https://github.com/fiveman1/rbxm-parser-ts" target="_blank" rel="noreferrer">Binary parser (MIT)</a></span>
+    </footer>
+  </main>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script>
+    (() => {
+      'use strict';
+
+      const BUILTIN_OUTPUT = `while true do\ntask.wait(0.1)\ngame.Players.LocalPlayer.PlayerGui.StudioGui.TopBar.Visible = true\ngame.Players.LocalPlayer.PlayerGui.StudioGui.MainBar.Visible = true\ngame.Players.LocalPlayer.PlayerGui.StudioGui.ExplorerPanel.Visible = true\ngame.Players.LocalPlayer.PlayerGui.StudioGui.PropertiesPanel.Visible = true\nend`;
+      const SAMPLE_XML = `<?xml version="1.0" encoding="utf-8"?>\n<roblox version="4">\n  <Item class="Model" referent="RBXModel1">\n    <Properties>\n      <string name="Name">SampleModel</string>\n    </Properties>\n    <Item class="Part" referent="RBXPart1">\n      <Properties>\n        <string name="Name">Platform</string>\n        <bool name="Anchored">true</bool>\n        <bool name="CanCollide">true</bool>\n        <Vector3 name="Size"><X>12</X><Y>1</Y><Z>12</Z></Vector3>\n        <CoordinateFrame name="CFrame"><X>0</X><Y>4</Y><Z>0</Z></CoordinateFrame>\n        <Color3 name="Color"><R>0.35</R><G>0.3</G><B>0.8</B></Color3>\n      </Properties>\n    </Item>\n    <Item class="Part" referent="RBXPart2">\n      <Properties>\n        <string name="Name">SmallPart</string>\n        <bool name="Anchored">true</bool>\n        <Vector3 name="Size"><X>2</X><Y>2</Y><Z>2</Z></Vector3>\n        <CoordinateFrame name="CFrame"><X>0</X><Y>6</Y><Z>0</Z></CoordinateFrame>\n      </Properties>\n    </Item>\n  </Item>\n</roblox>`;
+
+      const $ = (id) => document.getElementById(id);
+      const fileInput = $('fileInput');
+      const dropZone = $('dropZone');
+      const codeEditor = $('codeEditor');
+      const convertedTab = $('convertedTab');
+      const builtinTab = $('builtinTab');
+      const toast = $('toast');
+      let currentFile = null;
+      let convertedOutput = '-- Import file .rbxm/.rbxl atau .rbxmx/.rbxlx lalu klik Convert to Luau.\n-- Hasil akan muncul di sini.';
+      let activeOutput = 'builtin';
+      let toastTimer = null;
+      let lastSuggestedName = 'converted_model.lua';
+
+      codeEditor.value = BUILTIN_OUTPUT;
+      updateEditorMeta();
+
+      function escapeLuaString(value) {
+        let out = '"';
+        for (const ch of String(value)) {
+          const code = ch.codePointAt(0);
+          if (ch === '\\') out += '\\\\';
+          else if (ch === '"') out += '\\"';
+          else if (ch === '\n') out += '\\n';
+          else if (ch === '\r') out += '\\r';
+          else if (ch === '\t') out += '\\t';
+          else if (code < 32 || code === 127) out += '\\' + String(code).padStart(3, '0');
+          else out += ch;
+        }
+        return out + '"';
+      }
+
+      function safeIdentifier(value, fallback) {
+        let name = String(value || fallback).replace(/[^A-Za-z0-9_]/g, '_');
+        if (!name || /^[0-9]/.test(name)) name = 'obj_' + name;
+        return name;
+      }
+
+      function directChild(element, tag) {
+        return Array.from(element.children).find(child => child.tagName === tag) || null;
+      }
+
+      function childText(element, tag, fallback = null) {
+        const child = directChild(element, tag);
+        if (!child) return fallback;
+        const raw = child.textContent.trim();
+        if (raw === '') return fallback === null ? '' : fallback;
+        const n = Number(raw);
+        return Number.isFinite(n) ? n : raw;
+      }
+
+      function formatNumber(value) {
+        const n = Number(value);
+        if (!Number.isFinite(n)) return null;
+        if (Object.is(n, -0)) return '0';
+        return Number(n.toPrecision(12)).toString();
+      }
+
+      function enumTypeForProperty(propertyName) {
+        const enumTypes = {
+          Material: 'Material',
+          Shape: 'PartType',
+          FormFactor: 'FormFactor',
+          TopSurface: 'SurfaceType',
+          BottomSurface: 'SurfaceType',
+          LeftSurface: 'SurfaceType',
+          RightSurface: 'SurfaceType',
+          FrontSurface: 'SurfaceType',
+          BackSurface: 'SurfaceType'
+        };
+        return enumTypes[propertyName] || null;
+      }
+
+      function convertProperty(property, objectName, refMap, notes) {
+        const type = property.tagName;
+        const propName = property.getAttribute('name');
+        if (!propName || propName === 'Source' || type === 'BinaryString' || type === 'SharedString' || type === 'Content') {
+          if (propName === 'Source') notes.add('Source script dilewati: source Script/LocalScript tidak dapat disetel oleh Script biasa saat runtime.');
+          return [];
+        }
+        const text = property.textContent.trim();
+        if (['string', 'ProtectedString'].includes(type)) return [`${objectName}.${propName} = ${escapeLuaString(property.textContent)}`];
+        if (type === 'bool') {
+          if (text !== 'true' && text !== 'false') return [];
+          return [`${objectName}.${propName} = ${text}`];
+        }
+        if (type === 'int' && propName === 'BrickColor') {
+          const n = formatNumber(text);
+          return n === null ? [] : [`${objectName}.${propName} = BrickColor.new(${n})`];
+        }
+        if (['int','int64','float','double','Number'].includes(type)) {
+          const n = formatNumber(text);
+          return n === null ? [] : [`${objectName}.${propName} = ${n}`];
+        }
+        if (type === 'token') {
+          const enumType = enumTypeForProperty(propName);
+          const enumValue = formatNumber(text);
+          if (enumType && enumValue !== null) return [`pcall(function() ${objectName}.${propName} = enumByValue(Enum.${enumType}, ${enumValue}) end)`];
+          notes.add(`Token enum '${propName}' tidak dikenali; properti ini dilewati.`);
+          return [`-- TODO: properti enum '${propName}' dengan token ${escapeLuaString(text)} belum dipetakan.`];
+        }
+        if (type === 'Ref') {
+          if (text === 'null' || text === 'nil' || !text) return [`${objectName}.${propName} = nil`];
+          const target = refMap.get(text);
+          if (target) return [`${objectName}.${propName} = ${target}`];
+          notes.add(`Referensi '${propName}' ke ${text} tidak ditemukan dan dilewati.`);
+          return [`-- TODO: referensi '${propName}' perlu ditautkan manual.`];
+        }
+        if (type === 'Vector3') {
+          const x = formatNumber(childText(property,'X',0));
+          const y = formatNumber(childText(property,'Y',0));
+          const z = formatNumber(childText(property,'Z',0));
+          return [x && y && z ? `${objectName}.${propName} = Vector3.new(${x}, ${y}, ${z})` : `-- TODO: Vector3 ${propName} belum lengkap.`];
+        }
+        if (type === 'Vector2') {
+          const x = formatNumber(childText(property,'X',0));
+          const y = formatNumber(childText(property,'Y',0));
+          return [x && y ? `${objectName}.${propName} = Vector2.new(${x}, ${y})` : `-- TODO: Vector2 ${propName} belum lengkap.`];
+        }
+        if (type === 'Color3') {
+          const componentR = directChild(property, 'R');
+          const componentG = directChild(property, 'G');
+          const componentB = directChild(property, 'B');
+          if (componentR && componentG && componentB) {
+            const r = formatNumber(componentR.textContent);
+            const g = formatNumber(componentG.textContent);
+            const b = formatNumber(componentB.textContent);
+            return r !== null && g !== null && b !== null ? [`${objectName}.${propName} = Color3.new(${r}, ${g}, ${b})`] : [`-- TODO: Color3 ${propName} belum lengkap.`];
+          }
+          const packed = Number(text);
+          if (Number.isInteger(packed) && packed >= 0) {
+            const r = (packed >>> 16) & 255;
+            const g = (packed >>> 8) & 255;
+            const b = packed & 255;
+            return [`${objectName}.${propName} = Color3.fromRGB(${r}, ${g}, ${b})`];
+          }
+          return [`-- TODO: Color3 ${propName} belum lengkap.`];
+        }
+        if (type === 'CoordinateFrame' || type === 'CFrame') {
+          const x = formatNumber(childText(property,'X',0));
+          const y = formatNumber(childText(property,'Y',0));
+          const z = formatNumber(childText(property,'Z',0));
+          const rotNames = ['R00','R01','R02','R10','R11','R12','R20','R21','R22'];
+          const hasRotation = rotNames.some(k => directChild(property,k));
+          if (!hasRotation) return [`${objectName}.${propName} = CFrame.new(${x || '0'}, ${y || '0'}, ${z || '0'})`];
+          const rotation = rotNames.map(k => formatNumber(childText(property,k, k === 'R00' || k === 'R11' || k === 'R22' ? 1 : 0)));
+          return rotation.every(v => v !== null) ? [`${objectName}.${propName} = CFrame.new(${[x || '0', y || '0', z || '0', ...rotation].join(', ')})`] : [`-- TODO: CFrame ${propName} tidak valid.`];
+        }
+        if (type === 'UDim2') {
+          const xs = formatNumber(childText(property,'XS',0)); const xo = formatNumber(childText(property,'XO',0));
+          const ys = formatNumber(childText(property,'YS',0)); const yo = formatNumber(childText(property,'YO',0));
+          return [xs && xo && ys && yo ? `${objectName}.${propName} = UDim2.new(${xs}, ${xo}, ${ys}, ${yo})` : `-- TODO: UDim2 ${propName} belum lengkap.`];
+        }
+        if (type === 'UDim') {
+          const scale = formatNumber(childText(property,'S',0)); const offset = formatNumber(childText(property,'O',0));
+          return [scale && offset ? `${objectName}.${propName} = UDim.new(${scale}, ${offset})` : `-- TODO: UDim ${propName} belum lengkap.`];
+        }
+        if (type === 'BrickColor') {
+          const n = formatNumber(text);
+          return n === null ? [] : [`${objectName}.${propName} = BrickColor.new(${n})`];
+        }
+        if (type === 'PhysicalProperties') {
+          const density = childText(property,'D',null);
+          const friction = childText(property,'F',null);
+          const elasticity = childText(property,'E',null);
+          const frictionWeight = childText(property,'FW',null);
+          const elasticityWeight = childText(property,'EW',null);
+          const vals = [density,friction,elasticity,frictionWeight,elasticityWeight].map(formatNumber);
+          if (vals.every(v => v !== null)) return [`${objectName}.${propName} = PhysicalProperties.new(${vals.join(', ')})`];
+          return [];
+        }
+        if (type === 'Axes' || type === 'Faces' || type === 'SecurityCapabilities' || type === 'UniqueId' || type === 'Tags') return [];
+        notes.add(`Tipe properti '${type}' untuk '${propName}' belum didukung dan dilewati.`);
+        return [`-- TODO: properti '${propName}' bertipe ${type} perlu diatur manual.`];
+      }
+
+      const BINARY_IGNORED_CLASSES = new Set(['Script', 'LocalScript', 'ModuleScript']);
+      const BINARY_IGNORED_PROPS = new Set([
+        'Parent', 'Source', 'AttributesSerialize', 'ClassName', 'DataCost', 'RobloxLocked',
+        'Guid', 'UniqueId', 'Tags', 'Capabilities', 'DefinedCapabilities', 'Sandboxed',
+        'NetworkIsSpanning', 'AssemblyLinearVelocity', 'AssemblyAngularVelocity', 'ReceiveAge',
+        'Archivable', 'Prepared', 'WorldMatrix', 'Mass', 'CenterOfMass', 'PlaybackLoudness',
+        'Origin', 'HistoryId', 'CreatorId', 'CreatorType', 'GameId', 'PlaceId'
+      ]);
+      const BINARY_ENUM_TYPES = {
+        Material: 'Material', Shape: 'PartType', FormFactor: 'FormFactor',
+        TopSurface: 'SurfaceType', BottomSurface: 'SurfaceType', LeftSurface: 'SurfaceType',
+        RightSurface: 'SurfaceType', FrontSurface: 'SurfaceType', BackSurface: 'SurfaceType',
+        TextXAlignment: 'TextXAlignment', TextYAlignment: 'TextYAlignment', Font: 'Font',
+        SizeConstraint: 'SizeConstraint', AutomaticSize: 'AutomaticSize', ScaleType: 'ScaleType',
+        SortOrder: 'SortOrder', FillDirection: 'FillDirection', HorizontalAlignment: 'HorizontalAlignment',
+        VerticalAlignment: 'VerticalAlignment', EasingDirection: 'EasingDirection', EasingStyle: 'EasingStyle',
+        ZIndexBehavior: 'ZIndexBehavior', BorderMode: 'BorderMode', Face: 'NormalId',
+        Style: 'FrameStyle', ButtonStyle: 'ButtonStyle', CameraType: 'CameraType',
+        TextTruncate: 'TextTruncate', ResampleMode: 'ResamplerMode',
+        CollisionFidelity: 'CollisionFidelity', RenderFidelity: 'RenderFidelity'
+      };
+      let binaryParserPromise = null;
+
+      async function getBinaryParser() {
+        if (!binaryParserPromise) {
+          binaryParserPromise = (async () => {
+            // Buffer polyfill is needed by the parser's dependency graph in browser contexts.
+            if (!globalThis.Buffer) {
+              const bufferModule = await import('https://esm.sh/buffer@6.0.3');
+              globalThis.Buffer = bufferModule.Buffer || (bufferModule.default && bufferModule.default.Buffer);
+            }
+            return import('https://esm.sh/rbxm-parser@1.1.4?bundle');
+          })().catch(error => {
+            binaryParserPromise = null;
+            throw new Error('Tidak bisa memuat parser biner. Periksa koneksi internet lalu coba lagi. Detail: ' + (error && error.message ? error.message : 'CDN tidak tersedia'));
+          });
+        }
+        return binaryParserPromise;
+      }
+
+      function binaryNum(value) {
+        if (typeof value === 'bigint') value = Number(value);
+        return formatNumber(value);
+      }
+
+      function binaryLuaPropertyValue(propertyName, typedProperty, instanceVars, notes) {
+        if (!typedProperty || BINARY_IGNORED_PROPS.has(propertyName)) return null;
+        if (propertyName === 'Source') return null;
+        const type = Number(typedProperty.type);
+        const value = typedProperty.value;
+        const num = (v) => binaryNum(v);
+        const required = (...values) => values.every(v => v !== null && v !== undefined && Number.isFinite(Number(v)));
+        const todo = () => {
+          if (notes.size < 24) notes.add(`Properti biner '${propertyName}' (tipe ${type}) belum diserialisasi; properti dilewati.`);
+          return null;
+        };
+        if (value === null || value === undefined) return null;
+        if (type === 1) return escapeLuaString(value);                         // String
+        if (type === 2) return value ? 'true' : 'false';                       // Bool
+        if (type === 3 || type === 4 || type === 5 || type === 27) {          // Integers / floats
+          const n = num(value);
+          return n === null ? todo() : n;
+        }
+        if (type === 6) {                                                     // UDim
+          const scale = num(value.Scale), offset = num(value.Offset);
+          return required(scale, offset) ? `UDim.new(${scale}, ${offset})` : todo();
+        }
+        if (type === 7) {                                                     // UDim2
+          const xs = num(value.X && value.X.Scale), xo = num(value.X && value.X.Offset);
+          const ys = num(value.Y && value.Y.Scale), yo = num(value.Y && value.Y.Offset);
+          return required(xs, xo, ys, yo) ? `UDim2.new(${xs}, ${xo}, ${ys}, ${yo})` : todo();
+        }
+        if (type === 11) {                                                    // BrickColor
+          const n = num(value);
+          return n === null ? todo() : `BrickColor.new(${n})`;
+        }
+        if (type === 12 || type === 26) {                                    // Color3 / Color3uint8
+          const r = num(value.R), g = num(value.G), b = num(value.B);
+          return required(r, g, b) ? `Color3.new(${r}, ${g}, ${b})` : todo();
+        }
+        if (type === 13) {                                                    // Vector2
+          const x = num(value.X), y = num(value.Y);
+          return required(x, y) ? `Vector2.new(${x}, ${y})` : todo();
+        }
+        if (type === 14) {                                                    // Vector3
+          const x = num(value.X), y = num(value.Y), z = num(value.Z);
+          return required(x, y, z) ? `Vector3.new(${x}, ${y}, ${z})` : todo();
+        }
+        if (type === 16 || type === 30) {                                    // CFrame / OptionalCFrame
+          const pos = value.Position;
+          const parts = [num(pos && pos.X), num(pos && pos.Y), num(pos && pos.Z)];
+          const orientation = Array.isArray(value.Orientation) ? value.Orientation.map(num) : [];
+          if (!required(...parts)) return todo();
+          if (orientation.length === 9 && required(...orientation)) parts.push(...orientation);
+          return `CFrame.new(${parts.join(', ')})`;
+        }
+        if (type === 18) {                                                    // Enum
+          const enumType = BINARY_ENUM_TYPES[propertyName] || propertyName;
+          const enumName = value && value.Name;
+          const enumValue = num(value && value.Value);
+          if (enumName) return `Enum.${enumType}[${escapeLuaString(enumName)}]`;
+          if (enumValue !== null && /^[A-Za-z_][A-Za-z0-9_]*$/.test(enumType)) {
+            return `enumByValue(Enum.${enumType}, ${enumValue})`;
+          }
+          return todo();
+        }
+        if (type === 19) {                                                   // Instance reference
+          const target = instanceVars.get(value);
+          if (target) return target;
+          if (value) {
+            if (notes.size < 24) notes.add(`Referensi '${propertyName}' menuju objek yang dilewati atau tidak tersedia.`);
+          }
+          return null;
+        }
+        if (type === 20) {                                                   // Vector3int16
+          const x = num(value.X), y = num(value.Y), z = num(value.Z);
+          return required(x, y, z) ? `Vector3int16.new(${x}, ${y}, ${z})` : todo();
+        }
+        if (type === 23) {                                                   // NumberRange
+          const min = num(value.Min), max = num(value.Max);
+          return required(min, max) ? `NumberRange.new(${min}, ${max})` : todo();
+        }
+        if (type === 24) {                                                   // Rect
+          const minX = num(value.Min && value.Min.X), minY = num(value.Min && value.Min.Y);
+          const maxX = num(value.Max && value.Max.X), maxY = num(value.Max && value.Max.Y);
+          return required(minX, minY, maxX, maxY) ? `Rect.new(${minX}, ${minY}, ${maxX}, ${maxY})` : todo();
+        }
+        if (type === 25) {                                                   // PhysicalProperties
+          const vals = ['Density', 'Friction', 'Elasticity', 'FrictionWeight', 'ElasticityWeight'].map(k => num(value[k]));
+          return required(...vals) ? `PhysicalProperties.new(${vals.join(', ')})` : todo();
+        }
+        // Script bytecode, shared strings, sequences, security metadata, and asset internals are intentionally not copied.
+        return todo();
+      }
+
+      async function convertRobloxBinary(bytes, filename) {
+        const parserModule = await getBinaryParser();
+        const RobloxFile = parserModule.RobloxFile || (parserModule.default && parserModule.default.RobloxFile);
+        if (!RobloxFile || typeof RobloxFile.ReadFromBuffer !== 'function') {
+          throw new Error('Library parser berhasil dimuat, tetapi API pembacanya tidak ditemukan.');
+        }
+        let parsedFile;
+        try {
+          parsedFile = RobloxFile.ReadFromBuffer(bytes);
+        } catch (error) {
+          throw new Error('Parser biner gagal membaca file: ' + (error && error.message ? error.message : 'header/chunk tidak valid'));
+        }
+        if (!parsedFile || !Array.isArray(parsedFile.Roots) || !parsedFile.Roots.length) {
+          throw new Error('File dikenali sebagai biner, tetapi tidak berisi root Instance yang dapat dibaca.');
+        }
+
+        const extension = String(filename || '').split('.').pop().toLowerCase();
+        const roots = Array.from(parsedFile.Roots || []);
+        // An .rbxl is a place file: import objects under Workspace instead of trying to instantiate services.
+        let selectedRoots = roots;
+        if (extension === 'rbxl') {
+          const workspaceRoot = roots.find(root => root && root.ClassName === 'Workspace');
+          if (!workspaceRoot) throw new Error('File .rbxl berhasil dibuka, tetapi service Workspace tidak ditemukan. Coba ekspor model dari Workspace sebagai .rbxm.');
+          selectedRoots = Array.from(workspaceRoot.Children || []);
+        }
+
+        const nodes = [];
+        function collect(instance, parentIndex = null) {
+          if (!instance || BINARY_IGNORED_CLASSES.has(instance.ClassName)) return null;
+          const className = String(instance.ClassName || 'Folder');
+          const objectName = String(instance.Name || className);
+          const index = nodes.length;
+          const node = {
+            instance, className, objectName, variable: 'obj' + (index + 1),
+            parentIndex, children: [], properties: instance.Props instanceof Map ? Array.from(instance.Props.entries()) : []
+          };
+          nodes.push(node);
+          if (parentIndex !== null) nodes[parentIndex].children.push(index);
+          const children = Array.from(instance.Children || []);
+          for (const child of children) collect(child, index);
+          return index;
+        }
+        const topIndexes = selectedRoots.map(root => collect(root, null)).filter(index => index !== null);
+        if (!nodes.length) throw new Error('Tidak ada objek model yang tersisa setelah Script/LocalScript/ModuleScript dilewati.');
+
+        const instanceVars = new Map(nodes.map(node => [node.instance, node.variable]));
+        const notes = new Set();
+        const baseName = String(filename || 'ImportedModel').replace(/\.[^.]+$/, '').trim() || 'ImportedModel';
+        const lines = [
+          '-- Generated by RBX → Lua Converter',
+          '-- Parser biner: rbxm-parser (MIT); file diproses lokal di browser.',
+          '-- Script, LocalScript, dan ModuleScript beserta turunannya sengaja dilewati.',
+          '-- Tinjau TODO dan properti khusus sebelum menjalankan di Roblox Studio.',
+          '',
+          'local function enumByValue(enumType, value)',
+          '  for _, item in ipairs(enumType:GetEnumItems()) do',
+          '    if item.Value == value then return item end',
+          '  end',
+          '  return nil',
+          'end',
+          '',
+          'local importedModel = Instance.new("Model")',
+          `importedModel.Name = ${escapeLuaString(baseName)}`,
+          ''
+        ];
+        for (const node of nodes) lines.push(`local ${node.variable} = Instance.new(${escapeLuaString(node.className)})`);
+        lines.push('');
+        for (const node of nodes) {
+          if (node.objectName !== node.className || node.properties.some(([key]) => key === 'Name')) {
+            lines.push(`${node.variable}.Name = ${escapeLuaString(node.objectName)}`);
+          }
+          for (const [propertyName, typedProperty] of node.properties) {
+            if (propertyName === 'Name' || BINARY_IGNORED_PROPS.has(propertyName)) continue;
+            const valueExpression = binaryLuaPropertyValue(propertyName, typedProperty, instanceVars, notes);
+            if (valueExpression !== null) lines.push(`${node.variable}.${propertyName} = ${valueExpression}`);
+          }
+          if (node.parentIndex !== null) lines.push(`${node.variable}.Parent = ${nodes[node.parentIndex].variable}`);
+          else lines.push(`${node.variable}.Parent = importedModel`);
+          lines.push('');
+        }
+        lines.push('importedModel.Parent = workspace');
+        if (notes.size) {
+          lines.push('', '-- Conversion notes:');
+          for (const note of notes) lines.push('-- ' + note);
+        }
+        return {
+          code: lines.join('\n').replace(/\n{3,}/g, '\n\n'),
+          count: nodes.length,
+          roots: topIndexes.length,
+          notes: Array.from(notes),
+          classes: nodes.reduce((acc, node) => { acc[node.className] = (acc[node.className] || 0) + 1; return acc; }, {})
+        };
+      }
+
+      function convertRobloxXml(xmlText, filename) {
+        let normalizedXml = String(xmlText || '').replace(/^\uFEFF/, '');
+        // Some third-party XML exporters leave XML-illegal control bytes or bare ampersands in text.
+        normalizedXml = normalizedXml.replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F]/g, '');
+        normalizedXml = normalizedXml.replace(/&(?!#\d+;|#x[0-9a-f]+;|[a-zA-Z][\w.-]*;)/g, '&amp;');
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(normalizedXml, 'application/xml');
+        const parseError = doc.getElementsByTagName('parsererror')[0];
+        if (parseError) {
+          const detail = String(parseError.textContent || '').replace(/\s+/g, ' ').trim().slice(0, 240);
+          throw new Error('Browser gagal membaca XML. Detail: ' + (detail || 'struktur XML tidak dapat diparse') + '. Jika file berekstensi .rbxm/.rbxl, kemungkinan itu format biner, bukan XML.');
+        }
+        const root = doc.documentElement;
+        if (!root || String(root.localName || root.tagName).toLowerCase() !== 'roblox') throw new Error('Struktur XML tidak memiliki root <roblox>. Format file ini belum didukung.');
+        const rootItems = Array.from(root.children).filter(el => (el.localName || el.tagName) === 'Item' && !['Script', 'LocalScript', 'ModuleScript'].includes(el.getAttribute('class')));
+        if (!rootItems.length) throw new Error('Tidak ada objek model yang dapat dikonversi. Script, LocalScript, dan ModuleScript memang dilewati.');
+
+        const nodes = [];
+        const refMap = new Map();
+        function collect(element, parentIndex = null) {
+          const className = element.getAttribute('class') || 'Folder';
+          if (['Script', 'LocalScript', 'ModuleScript'].includes(className)) return null;
+          const properties = directChild(element, 'Properties');
+          const nameProperty = properties ? Array.from(properties.children).find(p => p.getAttribute('name') === 'Name') : null;
+          let objectName = nameProperty ? nameProperty.textContent : className;
+          if (!objectName.trim()) objectName = className;
+          const idx = nodes.length + 1;
+          const variable = 'obj' + idx;
+          const record = { element, className, objectName, variable, parentIndex, children: [], properties: properties ? Array.from(properties.children) : [], referent: element.getAttribute('referent') };
+          nodes.push(record);
+          if (record.referent) refMap.set(record.referent, variable);
+          if (parentIndex !== null) nodes[parentIndex].children.push(idx - 1);
+          for (const child of Array.from(element.children).filter(el => (el.localName || el.tagName) === 'Item' && !['Script', 'LocalScript', 'ModuleScript'].includes(el.getAttribute('class')))) collect(child, idx - 1);
+          return idx - 1;
+        }
+        const topIndexes = rootItems.map(item => collect(item, null)).filter(index => index !== null);
+        const notes = new Set();
+        const baseName = String(filename || 'ImportedModel').replace(/\.[^.]+$/, '');
+        const modelName = baseName.trim() || 'ImportedModel';
+        const lines = [
+          '-- Generated by RBX → Lua Converter',
+          '-- Review TODO comments and validate properties before running in Roblox Studio.',
+          '-- Place this Script in ServerScriptService for server-side model creation.',
+          '',
+          'local function enumByValue(enumType, value)',
+          '  for _, item in ipairs(enumType:GetEnumItems()) do',
+          '    if item.Value == value then return item end',
+          '  end',
+          '  return nil',
+          'end',
+          '',
+          'local importedModel = Instance.new("Model")',
+          `importedModel.Name = ${escapeLuaString(modelName)}`,
+          ''
+        ];
+        for (const node of nodes) {
+          lines.push(`local ${node.variable} = Instance.new(${escapeLuaString(node.className)})`);
+        }
+        lines.push('');
+        for (const node of nodes) {
+          const properties = node.properties.filter(p => p.getAttribute('name') !== 'Name');
+          if (node.objectName !== node.className || node.properties.some(p => p.getAttribute('name') === 'Name')) {
+            lines.push(`${node.variable}.Name = ${escapeLuaString(node.objectName)}`);
+          }
+          for (const prop of properties) {
+            lines.push(...convertProperty(prop, node.variable, refMap, notes));
+          }
+          if (node.parentIndex !== null) lines.push(`${node.variable}.Parent = ${nodes[node.parentIndex].variable}`);
+          else lines.push(`${node.variable}.Parent = importedModel`);
+          lines.push('');
+        }
+        lines.push('importedModel.Parent = workspace');
+        if (notes.size) {
+          lines.push('', '-- Conversion notes:');
+          for (const note of notes) lines.push('-- ' + note);
+        }
+        return { code: lines.join('\n').replace(/\n{3,}/g, '\n\n'), count: nodes.length, roots: topIndexes.length, notes: Array.from(notes), classes: nodes.reduce((acc, n) => { acc[n.className] = (acc[n.className] || 0) + 1; return acc; }, {}) };
+      }
+
+      function bytesLabel(size) {
+        if (size < 1024) return size + ' B';
+        if (size < 1024 * 1024) return (size / 1024).toFixed(1) + ' KB';
+        return (size / (1024 * 1024)).toFixed(2) + ' MB';
+      }
+
+      function notify(message) {
+        toast.textContent = message;
+        toast.classList.add('show');
+        if (toastTimer) clearTimeout(toastTimer);
+        toastTimer = setTimeout(() => toast.classList.remove('show'), 3200);
+      }
+
+      function setStatus(message, state = 'success') {
+        const status = $('status');
+        status.className = 'status ' + state;
+        $('statusText').textContent = message;
+      }
+
+      function updateEditorMeta() {
+        $('lineCount').textContent = codeEditor.value.split('\n').length + ' lines';
+        $('editorHint').textContent = activeOutput === 'builtin' ? 'Kode dapat diedit' : 'Output konversi · dapat diedit';
+        $('editorLabel').textContent = activeOutput === 'builtin' ? 'studio_gui_visibility.lua' : lastSuggestedName;
+      }
+
+      function switchOutput(kind) {
+        if (kind !== activeOutput) {
+          if (activeOutput === 'builtin') window.__rbxBuiltInEdited = codeEditor.value;
+          else convertedOutput = codeEditor.value;
+        }
+        activeOutput = kind;
+        convertedTab.classList.toggle('active', kind === 'converted');
+        builtinTab.classList.toggle('active', kind === 'builtin');
+        convertedTab.setAttribute('aria-selected', String(kind === 'converted'));
+        builtinTab.setAttribute('aria-selected', String(kind === 'builtin'));
+        codeEditor.value = kind === 'builtin' ? (window.__rbxBuiltInEdited ?? BUILTIN_OUTPUT) : convertedOutput;
+        if (kind === 'builtin') setStatus('Built-in · LocalScript', 'warning');
+        else if (currentFile) setStatus('Converted output', 'success');
+        else setStatus('Menunggu file Roblox', 'warning');
+        updateEditorMeta();
+      }
+
+      async function acceptFile(file) {
+        if (!file) return;
+        currentFile = file;
+        $('fileCard').classList.add('visible');
+        $('fileName').textContent = file.name;
+        $('fileSize').textContent = bytesLabel(file.size);
+        $('fileExt').textContent = (file.name.split('.').pop() || 'FILE').toUpperCase().slice(0, 5);
+        $('conversionStats').textContent = `File terpilih: ${file.name}. Klik Convert to Luau untuk memproses file.`;
+        setStatus('File dipilih · siap diproses', 'warning');
+        try {
+          const buffer = await file.arrayBuffer();
+          const bytes = new Uint8Array(buffer);
+          const prefix = new TextDecoder('latin1').decode(bytes.slice(0, 8));
+          const ext = file.name.split('.').pop().toLowerCase();
+          const isRobloxBinary = prefix === '<roblox!' || (bytes.length >= 14 && bytes[0] === 0x3c && bytes[1] === 0x72 && bytes[2] === 0x6f && bytes[3] === 0x62 && bytes[4] === 0x6c && bytes[5] === 0x6f && bytes[6] === 0x78 && bytes[7] === 0x21 && bytes[8] === 0x89 && bytes[9] === 0xff);
+          if (isRobloxBinary || (['rbxm','rbxl'].includes(ext) && !(bytes[0] === 0x3c && bytes[1] === 0x72 && bytes[2] === 0x6f && bytes[3] === 0x62 && bytes[4] === 0x6c && bytes[5] === 0x6f && bytes[6] === 0x78 && bytes[7] !== 0x21))) {
+            window.__rbxXmlText = null;
+            window.__rbxBinaryData = bytes;
+            window.__rbxInputFormat = 'binary';
+            convertedOutput = '-- File biner siap diproses dengan parser RBXM.\n-- Script, LocalScript, dan ModuleScript akan dilewati.\n-- Klik Convert to Luau. Koneksi internet diperlukan untuk memuat library parser.';
+            switchOutput('converted');
+            setStatus('Biner terdeteksi · siap dikonversi', 'warning');
+            notify('File biner terdeteksi. Klik Convert to Luau untuk memproses.');
+            return;
+          }
+          window.__rbxBinaryData = null;
+          window.__rbxInputFormat = 'xml';
+          let text;
+          if (bytes.length >= 2 && bytes[0] === 0xff && bytes[1] === 0xfe) text = new TextDecoder('utf-16le').decode(buffer);
+          else if (bytes.length >= 2 && bytes[0] === 0xfe && bytes[1] === 0xff) text = new TextDecoder('utf-16be').decode(buffer);
+          else text = new TextDecoder('utf-8').decode(buffer);
+          const trimmed = text.replace(/^\uFEFF/, '').trimStart();
+          if (trimmed.startsWith('<') && /<roblox(?:\s|>)/i.test(trimmed)) {
+            window.__rbxXmlText = text;
+            convertedOutput = '-- File XML siap dikonversi.\n-- Script, LocalScript, dan ModuleScript akan dilewati.\n-- Klik tombol Convert to Luau.';
+            switchOutput('converted');
+            notify('File XML siap dikonversi.');
+          } else {
+            window.__rbxXmlText = null;
+            convertedOutput = '-- File bukan XML Roblox yang dikenali.\n-- Pastikan kamu memakai .rbxmx/.rbxlx XML, bukan file biner .rbxm/.rbxl.';
+            switchOutput('converted');
+            setStatus('File tidak dikenali sebagai XML', 'error');
+            notify('File tidak dikenali sebagai XML Roblox.');
+          }
+        } catch (error) {
+          window.__rbxXmlText = null;
+          window.__rbxBinaryData = null;
+          window.__rbxInputFormat = null;
+          setStatus('Tidak bisa membaca file', 'error');
+          notify('Gagal membaca file: ' + error.message);
+        }
+      }
+
+      async function runConversion() {
+        if (!currentFile) {
+          notify('Pilih file Roblox terlebih dahulu, atau buka contoh model.');
+          return;
+        }
+        if (!window.__rbxXmlText && !(window.__rbxInputFormat === 'binary' && window.__rbxBinaryData)) {
+          notify('File ini belum siap dikonversi. Gunakan file Roblox .rbxm/.rbxl/.rbxmx/.rbxlx yang valid.');
+          return;
+        }
+        try {
+          setStatus('Memproses model...', 'warning');
+          const result = window.__rbxInputFormat === 'binary'
+            ? await convertRobloxBinary(window.__rbxBinaryData, currentFile.name)
+            : convertRobloxXml(window.__rbxXmlText, currentFile.name);
+          convertedOutput = result.code;
+          switchOutput('converted');
+          setStatus(result.notes.length ? 'Selesai · periksa catatan TODO' : 'Konversi selesai', result.notes.length ? 'warning' : 'success');
+          const classSummary = Object.entries(result.classes).slice(0, 4).map(([k,v]) => `${k} ×${v}`).join(', ');
+          $('conversionStats').textContent = `${result.count} Instance dibaca · ${result.roots} objek akar · ${result.notes.length} catatan. ${classSummary}${Object.keys(result.classes).length > 4 ? ', …' : ''}`;
+          lastSuggestedName = currentFile.name.replace(/\.[^.]+$/, '') + '.lua';
+          updateEditorMeta();
+          notify(`Konversi selesai: ${result.count} Instance diproses.`);
+        } catch (error) {
+          convertedOutput = '-- Konversi gagal.\n-- ' + String(error.message || error).replace(/\n/g, ' ');
+          switchOutput('converted');
+          setStatus('Konversi gagal', 'error');
+          $('conversionStats').textContent = 'Konversi gagal. Lihat pesan error di panel output untuk detailnya.';
+          notify(error.message || 'Konversi gagal.');
+        }
+      }
+
+      function clearFile() {
+        currentFile = null;
+        window.__rbxXmlText = null;
+        window.__rbxBinaryData = null;
+        window.__rbxInputFormat = null;
+        fileInput.value = '';
+        $('fileCard').classList.remove('visible');
+        $('conversionStats').textContent = 'Belum ada model diproses. Import file Roblox untuk melihat jumlah Instance yang dibaca.';
+        setStatus('Menunggu file Roblox', 'warning');
+      }
+
+      function downloadCurrent() {
+        const code = codeEditor.value;
+        const blob = new Blob([code], { type: 'text/plain;charset=utf-8' });
+        const url = URL.createObjectURL(blob);
+        const anchor = document.createElement('a');
+        anchor.href = url;
+        anchor.download = activeOutput === 'builtin' ? 'studio_gui_visibility.lua' : lastSuggestedName;
+        document.body.appendChild(anchor);
+        anchor.click();
+        anchor.remove();
+        URL.revokeObjectURL(url);
+        notify('File Lua berhasil disiapkan untuk diunduh.');
+      }
+
+      async function copyCurrent() {
+        try {
+          if (navigator.clipboard && window.isSecureContext) {
+            await navigator.clipboard.writeText(codeEditor.value);
+          } else {
+            codeEditor.focus();
+            codeEditor.select();
+            const success = document.execCommand('copy');
+            codeEditor.setSelectionRange(codeEditor.value.length, codeEditor.value.length);
+            if (!success) throw new Error('Clipboard tidak tersedia');
+          }
+          notify('Kode berhasil disalin.');
+        } catch (error) {
+          codeEditor.focus();
+          codeEditor.select();
+          notify('Clipboard otomatis tidak tersedia. Kode sudah dipilih untuk disalin manual.');
+        }
+      }
+
+      fileInput.addEventListener('change', event => acceptFile(event.target.files && event.target.files[0]));
+      $('convertBtn').addEventListener('click', runConversion);
+      $('removeFile').addEventListener('click', clearFile);
+      $('copyBtn').addEventListener('click', copyCurrent);
+      $('downloadBtn').addEventListener('click', downloadCurrent);
+      convertedTab.addEventListener('click', () => switchOutput('converted'));
+      builtinTab.addEventListener('click', () => switchOutput('builtin'));
+      codeEditor.addEventListener('input', () => {
+        if (activeOutput === 'builtin') window.__rbxBuiltInEdited = codeEditor.value;
+        else convertedOutput = codeEditor.value;
+        updateEditorMeta();
+      });
+      $('sampleBtn').addEventListener('click', () => {
+        const blob = new Blob([SAMPLE_XML], { type: 'application/xml' });
+        currentFile = new File([blob], 'SampleModel.rbxmx', { type: 'application/xml' });
+        window.__rbxXmlText = SAMPLE_XML;
+        window.__rbxBinaryData = null;
+        window.__rbxInputFormat = 'xml';
+        $('fileCard').classList.add('visible');
+        $('fileName').textContent = currentFile.name;
+        $('fileSize').textContent = bytesLabel(currentFile.size) + ' · contoh';
+        $('fileExt').textContent = 'RBXMX';
+        setStatus('Contoh model siap', 'success');
+        notify('Contoh model dimuat. Klik Convert to Luau.');
+        runConversion();
+      });
+
+      dropZone.addEventListener('dragover', event => { event.preventDefault(); dropZone.classList.add('dragging'); });
+      dropZone.addEventListener('dragleave', event => { if (!dropZone.contains(event.relatedTarget)) dropZone.classList.remove('dragging'); });
+      dropZone.addEventListener('drop', event => {
+        event.preventDefault();
+        dropZone.classList.remove('dragging');
+        const file = event.dataTransfer && event.dataTransfer.files && event.dataTransfer.files[0];
+        if (file) acceptFile(file);
+      });
+      dropZone.addEventListener('keydown', event => {
+        if (event.key === 'Enter' || event.key === ' ') {
+          event.preventDefault();
+          fileInput.click();
+        }
+      });
+    })();
+  </script>
+</body>
+</html>
