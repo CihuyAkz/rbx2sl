@@ -145,11 +145,6 @@
     .github-result a { display: block; overflow-wrap: anywhere; color: #ff9eaa; font-size: 10px; line-height: 1.7; text-decoration: underline; }
     .github-result .raw-url { margin-top: 5px; color: var(--muted); }
     .github-result .github-commit { margin-top: 7px; color: var(--subtle); font-size: 9px; }
-    .github-runner { margin-top: 14px; padding-top: 14px; border-top: 1px solid rgba(255,101,119,.18); }
-    .github-runner-title { margin-bottom: 6px; color: var(--text); font-size: 11px; font-weight: 800; }
-    .github-runner-help { margin: 0 0 10px; color: var(--muted); font-size: 10px; line-height: 1.65; }
-    .github-runner textarea { display: block; width: 100%; min-height: 245px; resize: vertical; padding: 12px; border: 1px solid #48232d; border-radius: 9px; background: #0a0407; color: #ead7dc; font: 10px/1.7 "SFMono-Regular", Consolas, "Liberation Mono", monospace; white-space: pre; }
-    .github-runner-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 9px; }
     .status { display: inline-flex; align-items: center; gap: 6px; min-width: 0; }
     .status-indicator { width: 6px; height: 6px; flex: 0 0 auto; border-radius: 50%; background: var(--subtle); }
     .status.success .status-indicator { background: var(--mint); }
@@ -227,7 +222,7 @@
         <h1>Model to <span class="accent">Lua.</span><br />Langsung di browser.</h1>
         <p class="hero-copy">Konversi model Roblox biner atau XML menjadi kode Luau untuk membuat ulang Instance, tanpa mengambil Script/LocalScript/ModuleScript dari model.</p>
       </div>
-      <div class="hero-note">FILE TETAP DI PERANGKATMU<br />Tidak diunggah ke server eksternal.</div>
+      <div class="hero-note">MODEL DIPROSES DI BROWSER<br />HASIL LUA DIUPLOAD KE GITHUB</div>
     </section>
 
     <section class="layout" aria-label="Workspace converter">
@@ -279,7 +274,7 @@
             <div class="step-number">02</div>
             <div>
               <h2>Lua Output</h2>
-              <div class="panel-kicker">Lihat, edit, salin, atau download script</div>
+              <div class="panel-kicker">Output hanya Loadstring untuk ditempel di Roblox Studio</div>
             </div>
           </div>
           <div class="output-actions">
@@ -291,19 +286,18 @@
             </button>
           </div>
         </div>
-        <div class="tabs" role="tablist" aria-label="Pilih jenis output">
-          <button class="tab" id="convertedTab" role="tab" aria-selected="false" type="button"><span class="tab-dot"></span>Converted Lua</button>
-          <button class="tab active" id="builtinTab" role="tab" aria-selected="true" type="button"><span class="tab-dot" style="background:var(--mint)"></span>Built-in Output</button>
+        <div class="tabs" aria-label="Jenis output">
+          <div class="tab active" id="convertedTab"><span class="tab-dot"></span>GitHub Loadstring</div>
         </div>
         <div class="editor-meta">
-          <div class="editor-language"><span class="language-mark">L</span><span id="editorLabel">studio_gui_visibility.lua</span></div>
+          <div class="editor-language"><span class="language-mark">L</span><span id="editorLabel">loadstring.lua</span></div>
           <span id="lineCount">9 lines</span>
         </div>
         <div class="editor-wrap">
-          <textarea class="editor" id="codeEditor" spellcheck="false" autocapitalize="off" autocomplete="off" aria-label="Kode Luau output"></textarea>
+          <textarea class="editor" id="codeEditor" readonly placeholder="Loadstring akan muncul setelah konversi berhasil di-upload ke GitHub." spellcheck="false" autocapitalize="off" autocomplete="off" aria-label="Loadstring Roblox Studio"></textarea>
           <div class="editor-foot">
             <span class="status warning" id="status"><span class="status-indicator"></span><span id="statusText">Built-in · LocalScript</span></span>
-            <span id="editorHint">Kode dapat diedit</span>
+            <span id="editorHint">Menunggu konversi dan upload GitHub</span>
           </div>
         </div>
         <section class="github-panel" aria-label="Upload hasil konversi ke GitHub">
@@ -314,7 +308,7 @@
             </div>
             <span class="tiny-label">OPTIONAL</span>
           </div>
-          <p class="github-help">Set repo tujuan. Sesudah commit upload, GitHub Actions yang memakai event <code>push</code> akan berjalan otomatis. Masukkan nama workflow jika ingin memicu build khusus lewat <code>workflow_dispatch</code>. URL HTTPS raw juga bisa dibuka langsung, tetapi file .lua adalah kode sumber dan tidak dieksekusi oleh browser.</p>
+          <p class="github-help">Isi konfigurasi repo satu kali selama halaman ini terbuka. Setiap klik <strong>Convert to Luau</strong> akan otomatis mengunggah hasil .lua ke GitHub. Setelah upload berhasil, output di atas hanya menampilkan satu baris <code>loadstring(...)</code> yang mengambil file itu dari repo. Repo wajib <strong>public</strong> supaya Roblox bisa membaca raw URL tanpa mengekspos token GitHub.</p>
           <div class="github-grid">
             <div class="github-field">
               <label for="githubOwner">Owner / username</label>
@@ -329,23 +323,17 @@
               <input id="githubBranch" type="text" autocomplete="off" value="main" placeholder="main" />
             </div>
             <div class="github-field">
-              <label for="githubPath">Path file di repo</label>
-              <input id="githubPath" type="text" autocomplete="off" placeholder="converted/hasil.lua" />
+              <label for="githubPath">Path file di repo (boleh dikosongkan untuk otomatis)</label>
+              <input id="githubPath" type="text" autocomplete="off" placeholder="converted/nama-model.lua" />
             </div>
             <div class="github-field full">
               <label for="githubToken">Fine-grained Personal Access Token</label>
               <input id="githubToken" type="password" autocomplete="off" spellcheck="false" placeholder="github_pat_…" />
             </div>
-            <div class="github-field full">
-              <label for="githubWorkflow">Nama workflow build (opsional)</label>
-              <input id="githubWorkflow" type="text" autocomplete="off" placeholder="build.yml atau deploy.yml" />
-            </div>
           </div>
-          <label class="github-checkbox"><input id="githubAutoUpload" type="checkbox" checked /><span>Upload otomatis sesudah konversi berhasil (bila semua konfigurasi terisi).</span></label>
-          <label class="github-checkbox"><input id="githubAutoOpenUrl" type="checkbox" checked /><span>Buka URL HTTPS raw secara otomatis setelah upload berhasil.</span></label>
-          <label class="github-checkbox"><input id="githubAutoBuild" type="checkbox" checked /><span>Trigger workflow build khusus jika nama workflow diisi (workflow harus mendukung <code>workflow_dispatch</code>).</span></label>
+          <label class="github-checkbox"><input id="githubAutoUpload" type="checkbox" checked disabled /><span>Upload otomatis setiap kali konversi berhasil.</span></label>
           <div class="github-actions">
-            <button class="icon-button" id="githubUploadBtn" type="button" title="Upload kode yang sedang tampil ke GitHub">Upload ke GitHub sekarang</button>
+            <button class="icon-button" id="githubUploadBtn" type="button" title="Upload ulang hasil konversi terakhir ke GitHub">Upload ulang hasil</button>
             <button class="icon-button" id="githubCopyUrlBtn" type="button" title="Salin URL hasil upload" disabled>Salin URL</button>
           </div>
           <p class="github-security">Keamanan: token hanya dipakai selama halaman ini terbuka dan tidak disimpan ke localStorage. Gunakan token fine-grained yang dibatasi ke satu repo. Izin minimum upload: <strong>Contents: Read and write</strong>. Untuk trigger workflow khusus, tambahkan <strong>Actions: Write</strong>. Jangan bagikan token ke siapa pun.</p>
@@ -353,18 +341,8 @@
             <div class="github-result-title">Hasil sudah di-upload</div>
             <a id="githubFileUrl" href="#" target="_blank" rel="noopener noreferrer">Buka file di GitHub</a>
             <a class="raw-url" id="githubRawUrl" href="#" target="_blank" rel="noopener noreferrer">Buka raw HTTPS URL</a>
-            <a class="raw-url" id="githubActionsUrl" href="#" target="_blank" rel="noopener noreferrer">Buka GitHub Actions / build</a>
-            <div class="github-commit" id="githubBuildStatus">Build: menunggu upload.</div>
             <div class="github-commit" id="githubCommit"></div>
-            <div class="github-runner" id="githubRunnerPanel" style="display:none">
-              <div class="github-runner-title">Runner Script · jalankan file Lua yang sudah di-upload</div>
-              <p class="github-runner-help">Salin script ini ke Roblox Studio sebagai <strong>Script</strong> di <code>ServerScriptService</code>. Aktifkan <em>Allow HTTP Requests</em> di Game Settings → Security, dan aktifkan <code>ServerScriptService.LoadStringEnabled</code> di Studio. Loader ini memerlukan repository publik, menjalankan kode dari URL GitHub, dan tidak menyimpan token GitHub. Jalankan hanya kode yang kamu percaya.</p>
-              <textarea id="githubRunnerOutput" rows="12" readonly spellcheck="false" aria-label="Generated Roblox Lua runner script"></textarea>
-              <div class="github-runner-actions">
-                <button class="icon-button" id="githubCopyRunnerBtn" type="button">Salin Runner Script</button>
-                <button class="icon-button" id="githubDownloadRunnerBtn" type="button">Download runner.lua</button>
-              </div>
-            </div>
+            <p class="github-security" style="margin-bottom:0">Tempel loadstring sebagai <strong>Script</strong> di <code>ServerScriptService</code>. Roblox harus mengizinkan HTTP Requests dan <code>ServerScriptService.LoadStringEnabled</code>. Aktifkan loadstring hanya bila kamu memahami risikonya; Roblox menyarankan fitur ini tetap nonaktif demi keamanan.</p>
           </div>
         </section>
       </section>
@@ -396,7 +374,6 @@
     (() => {
       'use strict';
 
-      const BUILTIN_OUTPUT = `while true do\ntask.wait(0.1)\ngame.Players.LocalPlayer.PlayerGui.StudioGui.TopBar.Visible = true\ngame.Players.LocalPlayer.PlayerGui.StudioGui.MainBar.Visible = true\ngame.Players.LocalPlayer.PlayerGui.StudioGui.ExplorerPanel.Visible = true\ngame.Players.LocalPlayer.PlayerGui.StudioGui.PropertiesPanel.Visible = true\nend`;
       const SAMPLE_XML = `<?xml version="1.0" encoding="utf-8"?>\n<roblox version="4">\n  <Item class="Model" referent="RBXModel1">\n    <Properties>\n      <string name="Name">SampleModel</string>\n    </Properties>\n    <Item class="Part" referent="RBXPart1">\n      <Properties>\n        <string name="Name">Platform</string>\n        <bool name="Anchored">true</bool>\n        <bool name="CanCollide">true</bool>\n        <Vector3 name="Size"><X>12</X><Y>1</Y><Z>12</Z></Vector3>\n        <CoordinateFrame name="CFrame"><X>0</X><Y>4</Y><Z>0</Z></CoordinateFrame>\n        <Color3 name="Color"><R>0.35</R><G>0.3</G><B>0.8</B></Color3>\n      </Properties>\n    </Item>\n    <Item class="Part" referent="RBXPart2">\n      <Properties>\n        <string name="Name">SmallPart</string>\n        <bool name="Anchored">true</bool>\n        <Vector3 name="Size"><X>2</X><Y>2</Y><Z>2</Z></Vector3>\n        <CoordinateFrame name="CFrame"><X>0</X><Y>6</Y><Z>0</Z></CoordinateFrame>\n      </Properties>\n    </Item>\n  </Item>\n</roblox>`;
 
       const $ = (id) => document.getElementById(id);
@@ -404,11 +381,11 @@
       const dropZone = $('dropZone');
       const codeEditor = $('codeEditor');
       const convertedTab = $('convertedTab');
-      const builtinTab = $('builtinTab');
       const toast = $('toast');
       let currentFile = null;
-      let convertedOutput = '-- Import file .rbxm/.rbxl atau .rbxmx/.rbxlx lalu klik Convert to Luau.\n-- Hasil akan muncul di sini.';
-      let activeOutput = 'builtin';
+      let convertedOutput = '';
+      let loaderOutput = '';
+      let activeOutput = 'converted';
       let toastTimer = null;
       let editorMetaTimer = null;
       let lastSuggestedName = 'converted_model.lua';
@@ -416,7 +393,8 @@
       let lastUploadedRawUrl = '';
       let hasSuccessfulConversion = false;
 
-      codeEditor.value = BUILTIN_OUTPUT;
+      codeEditor.value = '';
+      codeEditor.readOnly = true;
       updateEditorMeta();
 
       function escapeLuaString(value) {
@@ -1108,7 +1086,7 @@
 
       function updateLineCount() {
         const value = codeEditor.value;
-        let lines = 1;
+        let lines = value.length ? 1 : 0;
         for (let i = 0; i < value.length; i++) {
           if (value.charCodeAt(i) === 10) lines++;
         }
@@ -1125,30 +1103,26 @@
 
       function updateEditorMeta() {
         updateLineCount();
-        $('editorHint').textContent = activeOutput === 'builtin' ? 'Kode dapat diedit' : 'Output konversi · dapat diedit';
-        $('editorLabel').textContent = activeOutput === 'builtin' ? 'studio_gui_visibility.lua' : lastSuggestedName;
+        $('editorHint').textContent = loaderOutput ? 'Satu baris Loadstring · siap disalin' : 'Menunggu konversi dan upload GitHub';
+        $('editorLabel').textContent = 'loadstring.lua';
       }
 
-      function switchOutput(kind) {
-        if (kind !== activeOutput) {
-          if (activeOutput === 'builtin') window.__rbxBuiltInEdited = codeEditor.value;
-          else convertedOutput = codeEditor.value;
-        }
-        activeOutput = kind;
-        convertedTab.classList.toggle('active', kind === 'converted');
-        builtinTab.classList.toggle('active', kind === 'builtin');
-        convertedTab.setAttribute('aria-selected', String(kind === 'converted'));
-        builtinTab.setAttribute('aria-selected', String(kind === 'builtin'));
-        codeEditor.value = kind === 'builtin' ? (window.__rbxBuiltInEdited ?? BUILTIN_OUTPUT) : convertedOutput;
-        if (kind === 'builtin') setStatus('Built-in · LocalScript', 'warning');
-        else if (currentFile) setStatus('Converted output', 'success');
-        else setStatus('Menunggu file Roblox', 'warning');
+      function switchOutput() {
+        activeOutput = 'converted';
+        codeEditor.value = loaderOutput;
         updateEditorMeta();
       }
 
       async function acceptFile(file) {
         if (!file) return;
         hasSuccessfulConversion = false;
+        convertedOutput = '';
+        loaderOutput = '';
+        lastUploadedUrl = '';
+        lastUploadedRawUrl = '';
+        codeEditor.value = '';
+        $('githubResult').classList.remove('visible');
+        $('githubCopyUrlBtn').disabled = true;
         currentFile = file;
         $('fileCard').classList.add('visible');
         $('fileName').textContent = file.name;
@@ -1166,7 +1140,7 @@
             window.__rbxXmlText = null;
             window.__rbxBinaryData = bytes;
             window.__rbxInputFormat = 'binary';
-            convertedOutput = '-- File biner siap diproses dengan parser RBXM.\n-- Script, LocalScript, dan ModuleScript akan dilewati.\n-- Klik Convert to Luau. Koneksi internet diperlukan untuk memuat library parser.';
+            convertedOutput = '';
             switchOutput('converted');
             setStatus('Biner terdeteksi · siap dikonversi', 'warning');
             notify('File biner terdeteksi. Klik Convert to Luau untuk memproses.');
@@ -1181,12 +1155,12 @@
           const trimmed = text.replace(/^\uFEFF/, '').trimStart();
           if (trimmed.startsWith('<') && /<roblox(?:\s|>)/i.test(trimmed)) {
             window.__rbxXmlText = text;
-            convertedOutput = '-- File XML siap dikonversi.\n-- Script, LocalScript, dan ModuleScript akan dilewati.\n-- Klik tombol Convert to Luau.';
+            convertedOutput = '';
             switchOutput('converted');
             notify('File XML siap dikonversi.');
           } else {
             window.__rbxXmlText = null;
-            convertedOutput = '-- File bukan XML Roblox yang dikenali.\n-- Pastikan kamu memakai .rbxmx/.rbxlx XML, bukan file biner .rbxm/.rbxl.';
+            convertedOutput = '';
             switchOutput('converted');
             setStatus('File tidak dikenali sebagai XML', 'error');
             notify('File tidak dikenali sebagai XML Roblox.');
@@ -1209,33 +1183,46 @@
           notify('File ini belum siap dikonversi. Gunakan file Roblox .rbxm/.rbxl/.rbxmx/.rbxlx yang valid.');
           return;
         }
+        if (!isGitHubConfigured()) {
+          loaderOutput = '';
+          codeEditor.value = '';
+          updateEditorMeta();
+          setStatus('Konfigurasi GitHub belum lengkap', 'warning');
+          notify('Isi Owner, Repository, Branch, dan token GitHub dulu. Setelah itu klik Convert; upload akan berjalan otomatis.');
+          return;
+        }
         try {
           hasSuccessfulConversion = false;
+          loaderOutput = '';
+          codeEditor.value = '';
+          updateEditorMeta();
           setStatus('Memproses model...', 'warning');
           const result = window.__rbxInputFormat === 'binary'
             ? await convertRobloxBinary(window.__rbxBinaryData, currentFile.name)
             : convertRobloxXml(window.__rbxXmlText, currentFile.name);
           convertedOutput = result.code;
-          switchOutput('converted');
-          setStatus(result.notes.length ? 'Selesai · periksa catatan TODO' : 'Konversi selesai', result.notes.length ? 'warning' : 'success');
+          setStatus('Konversi selesai · upload otomatis ke GitHub...', 'warning');
           const classSummary = Object.entries(result.classes).slice(0, 4).map(([k,v]) => `${k} ×${v}`).join(', ');
           $('conversionStats').textContent = `${result.count} Instance dibaca · ${result.roots} objek akar · ${result.notes.length} catatan. ${classSummary}${Object.keys(result.classes).length > 4 ? ', …' : ''}`;
           lastSuggestedName = currentFile.name.replace(/\.[^.]+$/, '') + '.lua';
           hasSuccessfulConversion = true;
-          if (!$('githubPath').value.trim()) $('githubPath').value = 'converted/' + lastSuggestedName;
           updateEditorMeta();
-          if ($('githubAutoUpload').checked && isGitHubConfigured()) {
-            notify(`Konversi selesai (${result.count} Instance). Mengunggah hasil ke GitHub...`);
-            await uploadCurrentToGitHub({ automatic: true });
-          } else {
-            notify(`Konversi selesai: ${result.count} Instance diproses.`);
+          notify(`Konversi selesai (${result.count} Instance). Mengunggah otomatis ke GitHub...`);
+          const uploaded = await uploadCurrentToGitHub({ automatic: true });
+          if (!uploaded) {
+            loaderOutput = '';
+            codeEditor.value = '';
+            updateEditorMeta();
+            $('conversionStats').textContent += ' · Upload GitHub gagal, sehingga Loadstring belum dibuat.';
           }
         } catch (error) {
           hasSuccessfulConversion = false;
-          convertedOutput = '-- Konversi gagal.\n-- ' + String(error.message || error).replace(/\n/g, ' ');
-          switchOutput('converted');
+          convertedOutput = '';
+          loaderOutput = '';
+          codeEditor.value = '';
+          updateEditorMeta();
           setStatus('Konversi gagal', 'error');
-          $('conversionStats').textContent = 'Konversi gagal. Lihat pesan error di panel output untuk detailnya.';
+          $('conversionStats').textContent = 'Konversi gagal. ' + String(error.message || error);
           notify(error.message || 'Konversi gagal.');
         }
       }
@@ -1245,7 +1232,6 @@
           $('githubOwner').value.trim() &&
           $('githubRepo').value.trim() &&
           $('githubBranch').value.trim() &&
-          $('githubPath').value.trim() &&
           $('githubToken').value.trim()
         );
       }
@@ -1260,88 +1246,31 @@
         return btoa(binary);
       }
 
-      function makeGitHubRunnerScript(sourceUrl) {
-        const safeUrl = JSON.stringify(sourceUrl);
-        return `-- Generated by RBX -> Lua Converter.
--- Place this Script inside ServerScriptService in Roblox Studio.
--- Enable Game Settings > Security > Allow HTTP Requests.
--- In Studio, enable ServerScriptService.LoadStringEnabled (disabled by default).
--- SECURITY: this downloads and executes remote code. Use only a source you own and have reviewed.
-
-local HttpService = game:GetService("HttpService")
-local SOURCE_URL = ${safeUrl}
-
-local downloadOk, sourceOrError = pcall(function()
-    return HttpService:GetAsync(SOURCE_URL, true)
-end)
-
-if not downloadOk then
-    error("[GitHub Loader] Failed to download uploaded Lua: " .. tostring(sourceOrError))
-end
-
-local source = sourceOrError
-if type(source) ~= "string" or source == "" then
-    error("[GitHub Loader] The downloaded Lua source is empty or invalid.")
-end
-
-local chunk, compileError = loadstring(source, "@GitHubUploadedLua")
-if not chunk then
-    error("[GitHub Loader] Lua compile error: " .. tostring(compileError))
-end
-
-local runOk, runError = pcall(chunk)
-if not runOk then
-    error("[GitHub Loader] Uploaded Lua raised an error: " .. tostring(runError))
-end
-`;
+      function makeGitHubLoadstring(sourceUrl) {
+        // One-line output only. This URL is pinned to the exact commit created by the upload.
+        return 'loadstring(game:GetService("HttpService"):GetAsync(' + escapeLuaString(sourceUrl) + ', true))()';
       }
 
-      function showGitHubResult(fileUrl, rawUrl, actionsUrl, commitSha, runnerUrl) {
-        // The copy-URL action copies the raw HTTPS endpoint of the converted Lua file.
+      function showGitHubResult(fileUrl, rawUrl, commitSha, runnerUrl) {
         lastUploadedUrl = rawUrl;
         lastUploadedRawUrl = rawUrl;
+        loaderOutput = makeGitHubLoadstring(runnerUrl || rawUrl);
+        codeEditor.value = loaderOutput;
         $('githubFileUrl').href = fileUrl;
         $('githubFileUrl').textContent = 'File di GitHub: ' + fileUrl;
         $('githubRawUrl').href = rawUrl;
-        $('githubRawUrl').textContent = 'HTTPS Raw URL: ' + rawUrl;
-        $('githubActionsUrl').href = actionsUrl;
-        $('githubActionsUrl').textContent = 'GitHub Actions / Build: ' + actionsUrl;
-        $('githubBuildStatus').textContent = 'Build: commit sudah dikirim. Workflow dengan trigger push berjalan otomatis jika sudah dikonfigurasi.';
+        $('githubRawUrl').textContent = 'Raw URL GitHub: ' + rawUrl;
         $('githubCommit').textContent = commitSha ? 'Commit: ' + commitSha : '';
-        $('githubRunnerOutput').value = makeGitHubRunnerScript(runnerUrl || rawUrl);
-        $('githubRunnerPanel').style.display = 'block';
         $('githubResult').classList.add('visible');
         $('githubCopyUrlBtn').disabled = false;
+        updateEditorMeta();
       }
 
-      async function triggerGitHubBuild(owner, repo, branch, workflowFile, headers) {
-        const cleanWorkflow = workflowFile.trim();
-        if (!cleanWorkflow) return { triggered: false, reason: 'Workflow tidak diisi; mengandalkan workflow dengan trigger push.' };
-        if (cleanWorkflow.includes('/') || cleanWorkflow.includes('..') || !/^[A-Za-z0-9_.-]+$/.test(cleanWorkflow)) {
-          throw new Error('Nama workflow harus nama file seperti build.yml, bukan path folder.');
-        }
-        const dispatchUrl = `https://api.github.com/repos/${encodeURIComponent(owner)}/${encodeURIComponent(repo)}/actions/workflows/${encodeURIComponent(cleanWorkflow)}/dispatches?return_run_details=true`;
-        const response = await fetch(dispatchUrl, {
-          method: 'POST',
-          headers,
-          body: JSON.stringify({ ref: branch })
-        });
-        if (!response.ok) {
-          const detail = await response.json().catch(() => ({}));
-          const message = detail && detail.message ? detail.message : `HTTP ${response.status}`;
-          if (response.status === 403 || response.status === 401) {
-            throw new Error(message + ' — untuk workflow_dispatch, token perlu izin Actions: Write dan workflow harus memiliki pemicu workflow_dispatch.');
-          }
-          throw new Error(message + ' — pastikan file workflow ada di .github/workflows/ dan mendukung workflow_dispatch.');
-        }
-        const data = await response.json().catch(() => ({}));
-        return { triggered: true, url: data.html_url || `https://github.com/${encodeURIComponent(owner)}/${encodeURIComponent(repo)}/actions` };
-      }
 
       async function uploadCurrentToGitHub(options = {}) {
         const automatic = Boolean(options.automatic);
         if (!isGitHubConfigured()) {
-          const message = 'Lengkapi owner, repository, branch, path, dan token GitHub dulu.';
+          const message = 'Lengkapi owner, repository, branch, dan token GitHub dulu.';
           if (!automatic) notify(message);
           setStatus('Konfigurasi GitHub belum lengkap', 'warning');
           return false;
@@ -1351,6 +1280,7 @@ end
         const repo = $('githubRepo').value.trim();
         const branch = $('githubBranch').value.trim();
         let path = $('githubPath').value.trim().replace(/^\/+/, '');
+        if (!path) path = 'converted/' + (lastSuggestedName || 'converted_model.lua');
         const token = $('githubToken').value.trim();
         if (!/^[A-Za-z0-9_.-]+$/.test(owner) || !/^[A-Za-z0-9_.-]+$/.test(repo) || owner === '.' || owner === '..' || repo === '.' || repo === '..') {
           notify('Owner atau nama repository tidak valid.');
@@ -1395,6 +1325,11 @@ end
         try {
           setStatus('Mengunggah hasil ke GitHub...', 'warning');
           $('githubUploadBtn').disabled = true;
+          const repoResponse = await fetch(`https://api.github.com/repos/${encodeURIComponent(owner)}/${encodeURIComponent(repo)}`, { method: 'GET', headers });
+          const repoInfo = await repoResponse.json().catch(() => ({}));
+          if (!repoResponse.ok) throw new Error(repoInfo.message || `Tidak bisa memeriksa repository (HTTP ${repoResponse.status}).`);
+          if (repoInfo.private) throw new Error('Repository harus PUBLIC supaya Roblox bisa mengambil file melalui raw URL tanpa token. Ubah visibility repo menjadi public atau pilih repo publik.');
+
           let existingSha = null;
           const getResponse = await fetch(apiUrl + '?ref=' + encodeURIComponent(branch), { method: 'GET', headers });
           if (getResponse.ok) {
@@ -1418,37 +1353,14 @@ end
           const encodedPath = path.split('/').map(encodeURIComponent).join('/');
           const fileUrl = `https://github.com/${encodeURIComponent(owner)}/${encodeURIComponent(repo)}/blob/${encodedBranch}/${encodedPath}`;
           const rawUrl = `https://raw.githubusercontent.com/${encodeURIComponent(owner)}/${encodeURIComponent(repo)}/${encodedBranch}/${encodedPath}`;
-          const actionsUrl = `https://github.com/${encodeURIComponent(owner)}/${encodeURIComponent(repo)}/actions?query=${encodeURIComponent('branch:' + branch)}`;
           const commitSha = result.commit && result.commit.sha ? result.commit.sha : '';
           // Pin the runner to the exact upload commit so later branch changes don't silently change its source.
           const runnerRef = commitSha || encodedBranch;
           const runnerUrl = `https://raw.githubusercontent.com/${encodeURIComponent(owner)}/${encodeURIComponent(repo)}/${runnerRef}/${encodedPath}`;
-          showGitHubResult(fileUrl, rawUrl, actionsUrl, commitSha, runnerUrl);
+          showGitHubResult(fileUrl, rawUrl, commitSha, runnerUrl);
 
-          // A contents commit automatically triggers existing workflows configured for `on: push`.
-          if ($('githubAutoBuild').checked && $('githubWorkflow').value.trim()) {
-            $('githubBuildStatus').textContent = 'Build: mengirim trigger workflow...';
-            try {
-              const build = await triggerGitHubBuild(owner, repo, branch, $('githubWorkflow').value, headers);
-              if (build.triggered && build.url) {
-                $('githubActionsUrl').href = build.url;
-                $('githubActionsUrl').textContent = 'Buka build run: ' + build.url;
-                $('githubBuildStatus').textContent = 'Build: trigger workflow berhasil dikirim. Proses build berjalan di GitHub Actions.';
-              }
-            } catch (buildError) {
-              $('githubBuildStatus').textContent = 'Upload sukses, trigger build khusus gagal: ' + String(buildError.message || buildError);
-              notify('Upload sukses, tetapi trigger build khusus gagal. Periksa status Build di panel GitHub.');
-            }
-          }
-
-          setStatus('Upload ke GitHub berhasil', 'success');
-          notify('Hasil Lua berhasil di-upload. URL HTTPS dan link build tersedia di panel GitHub.');
-          if ($('githubAutoOpenUrl').checked) {
-            // Opening after network requests can be blocked by popup protections; the link remains available below.
-            const opened = window.open(rawUrl, '_blank');
-            if (opened) opened.opener = null;
-            else notify('Browser memblokir tab otomatis. Klik link HTTPS Raw URL di panel GitHub.');
-          }
+          setStatus('Upload ke GitHub berhasil · Loadstring siap', 'success');
+          notify('Berhasil! File sudah di-upload otomatis. Output sekarang hanya satu baris Loadstring untuk Roblox Studio.');
           return true;
         } catch (error) {
           setStatus('Upload GitHub gagal', 'error');
@@ -1457,53 +1369,6 @@ end
         } finally {
           $('githubUploadBtn').disabled = false;
         }
-      }
-
-      async function copyRunnerScript() {
-        const code = $('githubRunnerOutput').value;
-        if (!code.trim()) {
-          notify('Upload file Lua terlebih dahulu agar Runner Script dibuat.');
-          return;
-        }
-        try {
-          if (navigator.clipboard && window.isSecureContext) {
-            await navigator.clipboard.writeText(code);
-          } else {
-            const temp = document.createElement('textarea');
-            temp.value = code;
-            temp.setAttribute('readonly', '');
-            temp.style.position = 'fixed';
-            temp.style.opacity = '0';
-            document.body.appendChild(temp);
-            temp.select();
-            const ok = document.execCommand('copy');
-            temp.remove();
-            if (!ok) throw new Error('Clipboard tidak tersedia');
-          }
-          notify('Runner Script berhasil disalin.');
-        } catch (_) {
-          $('githubRunnerOutput').focus();
-          $('githubRunnerOutput').select();
-          notify('Clipboard tidak tersedia. Runner Script sudah dipilih untuk disalin manual.');
-        }
-      }
-
-      function downloadRunnerScript() {
-        const code = $('githubRunnerOutput').value;
-        if (!code.trim()) {
-          notify('Upload file Lua terlebih dahulu agar Runner Script dibuat.');
-          return;
-        }
-        const blob = new Blob([code], { type: 'text/plain;charset=utf-8' });
-        const url = URL.createObjectURL(blob);
-        const anchor = document.createElement('a');
-        anchor.href = url;
-        anchor.download = 'runner.lua';
-        document.body.appendChild(anchor);
-        anchor.click();
-        anchor.remove();
-        URL.revokeObjectURL(url);
-        notify('runner.lua berhasil disiapkan untuk diunduh.');
       }
 
       async function copyUploadedUrl() {
@@ -1535,6 +1400,14 @@ end
       function clearFile() {
         hasSuccessfulConversion = false;
         currentFile = null;
+        convertedOutput = '';
+        loaderOutput = '';
+        lastUploadedUrl = '';
+        lastUploadedRawUrl = '';
+        codeEditor.value = '';
+        $('githubResult').classList.remove('visible');
+        $('githubCopyUrlBtn').disabled = true;
+        updateEditorMeta();
         window.__rbxXmlText = null;
         window.__rbxBinaryData = null;
         window.__rbxInputFormat = null;
@@ -1546,11 +1419,15 @@ end
 
       function downloadCurrent() {
         const code = codeEditor.value;
+        if (!code.trim()) {
+          notify('Konversi dan upload ke GitHub dulu agar Loadstring dibuat.');
+          return;
+        }
         const blob = new Blob([code], { type: 'text/plain;charset=utf-8' });
         const url = URL.createObjectURL(blob);
         const anchor = document.createElement('a');
         anchor.href = url;
-        anchor.download = activeOutput === 'builtin' ? 'studio_gui_visibility.lua' : lastSuggestedName;
+        anchor.download = 'loadstring.lua';
         document.body.appendChild(anchor);
         anchor.click();
         anchor.remove();
@@ -1559,6 +1436,10 @@ end
       }
 
       async function copyCurrent() {
+        if (!loaderOutput.trim()) {
+          notify('Konversi dan upload ke GitHub dulu agar Loadstring dibuat.');
+          return;
+        }
         try {
           if (navigator.clipboard && window.isSecureContext) {
             await navigator.clipboard.writeText(codeEditor.value);
@@ -1584,15 +1465,7 @@ end
       $('downloadBtn').addEventListener('click', downloadCurrent);
       $('githubUploadBtn').addEventListener('click', () => uploadCurrentToGitHub());
       $('githubCopyUrlBtn').addEventListener('click', copyUploadedUrl);
-      $('githubCopyRunnerBtn').addEventListener('click', copyRunnerScript);
-      $('githubDownloadRunnerBtn').addEventListener('click', downloadRunnerScript);
       convertedTab.addEventListener('click', () => switchOutput('converted'));
-      builtinTab.addEventListener('click', () => switchOutput('builtin'));
-      codeEditor.addEventListener('input', () => {
-        if (activeOutput === 'builtin') window.__rbxBuiltInEdited = codeEditor.value;
-        else convertedOutput = codeEditor.value;
-        scheduleLineCountUpdate();
-      });
       $('sampleBtn').addEventListener('click', () => {
         const blob = new Blob([SAMPLE_XML], { type: 'application/xml' });
         currentFile = new File([blob], 'SampleModel.rbxmx', { type: 'application/xml' });
