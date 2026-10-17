@@ -123,6 +123,33 @@
     .editor { display: block; resize: vertical; width: 100%; min-height: 360px; max-height: 650px; border: 1px solid #3a1821; border-radius: 12px; padding: 17px 16px; background: #0a0407; color: #ead7dc; font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace; font-size: 11px; line-height: 1.85; tab-size: 2; white-space: pre; overflow: auto; }
     .editor:focus { border-color: #a62a43; outline: none; }
     .editor-foot { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 11px; color: var(--subtle); font-size: 10px; }
+    .github-panel { margin: 0 20px 20px; padding: 17px; border: 1px solid #3d1a24; border-radius: 14px; background: linear-gradient(145deg, rgba(255,77,97,.055), rgba(255,255,255,.012)); }
+    .github-panel-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 7px; }
+    .github-panel-title { display: flex; align-items: center; gap: 9px; font-size: 12px; font-weight: 800; }
+    .github-panel-title svg { width: 17px; height: 17px; color: var(--mint); }
+    .github-help { margin: 0 0 14px; color: var(--muted); font-size: 10px; line-height: 1.65; }
+    .github-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+    .github-field { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+    .github-field.full { grid-column: 1 / -1; }
+    .github-field label { color: #d7c2c8; font-size: 10px; font-weight: 750; }
+    .github-field input { min-width: 0; width: 100%; padding: 10px 11px; border: 1px solid #48232d; border-radius: 9px; background: #0a0407; color: var(--text); font-size: 11px; }
+    .github-field input::placeholder { color: #77565e; }
+    .github-checkbox { display: flex; align-items: flex-start; gap: 8px; margin-top: 12px; color: var(--muted); font-size: 10px; line-height: 1.55; }
+    .github-checkbox input { margin: 2px 0 0; accent-color: var(--purple); }
+    .github-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 13px; }
+    .github-actions .icon-button { min-height: 34px; }
+    .github-security { margin-top: 11px; color: var(--subtle); font-size: 9px; line-height: 1.65; }
+    .github-result { display: none; margin-top: 13px; padding: 12px; border: 1px solid rgba(255,101,119,.24); border-radius: 10px; background: rgba(255,101,119,.045); }
+    .github-result.visible { display: block; }
+    .github-result-title { margin-bottom: 8px; color: var(--mint); font-size: 10px; font-weight: 800; }
+    .github-result a { display: block; overflow-wrap: anywhere; color: #ff9eaa; font-size: 10px; line-height: 1.7; text-decoration: underline; }
+    .github-result .raw-url { margin-top: 5px; color: var(--muted); }
+    .github-result .github-commit { margin-top: 7px; color: var(--subtle); font-size: 9px; }
+    .github-runner { margin-top: 14px; padding-top: 14px; border-top: 1px solid rgba(255,101,119,.18); }
+    .github-runner-title { margin-bottom: 6px; color: var(--text); font-size: 11px; font-weight: 800; }
+    .github-runner-help { margin: 0 0 10px; color: var(--muted); font-size: 10px; line-height: 1.65; }
+    .github-runner textarea { display: block; width: 100%; min-height: 245px; resize: vertical; padding: 12px; border: 1px solid #48232d; border-radius: 9px; background: #0a0407; color: #ead7dc; font: 10px/1.7 "SFMono-Regular", Consolas, "Liberation Mono", monospace; white-space: pre; }
+    .github-runner-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 9px; }
     .status { display: inline-flex; align-items: center; gap: 6px; min-width: 0; }
     .status-indicator { width: 6px; height: 6px; flex: 0 0 auto; border-radius: 50%; background: var(--subtle); }
     .status.success .status-indicator { background: var(--mint); }
@@ -169,6 +196,9 @@
       .editor-meta { padding: 12px 15px 9px; }
       .editor-wrap { padding: 0 14px 15px; }
       .editor { min-height: 320px; font-size: 10px; padding: 13px 11px; }
+      .github-panel { margin: 0 14px 15px; padding: 13px; }
+      .github-grid { grid-template-columns: 1fr; }
+      .github-field.full { grid-column: auto; }
       .lower-grid { grid-template-columns: 1fr; }
       .mini-card:last-child { grid-column: auto; }
       .footer { align-items: flex-start; flex-direction: column; }
@@ -253,8 +283,8 @@
             </div>
           </div>
           <div class="output-actions">
-            <button class="icon-button" id="copyBtn" type="button" title="Salin kode saat ini">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h3"/></svg> Copy
+            <button class="icon-button" id="copyBtn" type="button" title="Salin kode saat ini ke clipboard">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h3"/></svg> Salin ke Clipboard
             </button>
             <button class="icon-button" id="downloadBtn" type="button" title="Unduh kode saat ini sebagai file Lua">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12m0 0 4-4m-4 4-4-4"/><path d="M4 17v3h16v-3"/></svg> Download .lua
@@ -276,6 +306,67 @@
             <span id="editorHint">Kode dapat diedit</span>
           </div>
         </div>
+        <section class="github-panel" aria-label="Upload hasil konversi ke GitHub">
+          <div class="github-panel-head">
+            <div class="github-panel-title">
+              <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 .9a11.1 11.1 0 0 0-3.51 21.63c.56.1.76-.24.76-.54v-2.1c-3.1.67-3.75-1.32-3.75-1.32-.51-1.3-1.25-1.65-1.25-1.65-1.02-.7.08-.69.08-.69 1.12.08 1.71 1.15 1.71 1.15 1 .1.77 2.2 3.2 1.56.1-.73.39-1.22.7-1.5-2.47-.28-5.06-1.24-5.06-5.5 0-1.22.43-2.22 1.15-3-.12-.28-.5-1.42.11-2.96 0 0 .94-.3 3.05 1.15a10.6 10.6 0 0 1 5.55 0c2.12-1.44 3.05-1.15 3.05-1.15.61 1.54.23 2.68.12 2.96.71.78 1.14 1.78 1.14 3 0 4.27-2.59 5.21-5.07 5.49.4.35.75 1.02.75 2.06v3.05c0 .3.2.65.77.54A11.1 11.1 0 0 0 12 .9Z"/></svg>
+              Upload hasil ke GitHub
+            </div>
+            <span class="tiny-label">OPTIONAL</span>
+          </div>
+          <p class="github-help">Set repo tujuan. Sesudah commit upload, GitHub Actions yang memakai event <code>push</code> akan berjalan otomatis. Masukkan nama workflow jika ingin memicu build khusus lewat <code>workflow_dispatch</code>. URL HTTPS raw juga bisa dibuka langsung, tetapi file .lua adalah kode sumber dan tidak dieksekusi oleh browser.</p>
+          <div class="github-grid">
+            <div class="github-field">
+              <label for="githubOwner">Owner / username</label>
+              <input id="githubOwner" type="text" autocomplete="off" placeholder="username GitHub" />
+            </div>
+            <div class="github-field">
+              <label for="githubRepo">Nama repository</label>
+              <input id="githubRepo" type="text" autocomplete="off" placeholder="nama-repo" />
+            </div>
+            <div class="github-field">
+              <label for="githubBranch">Branch</label>
+              <input id="githubBranch" type="text" autocomplete="off" value="main" placeholder="main" />
+            </div>
+            <div class="github-field">
+              <label for="githubPath">Path file di repo</label>
+              <input id="githubPath" type="text" autocomplete="off" placeholder="converted/hasil.lua" />
+            </div>
+            <div class="github-field full">
+              <label for="githubToken">Fine-grained Personal Access Token</label>
+              <input id="githubToken" type="password" autocomplete="off" spellcheck="false" placeholder="github_pat_…" />
+            </div>
+            <div class="github-field full">
+              <label for="githubWorkflow">Nama workflow build (opsional)</label>
+              <input id="githubWorkflow" type="text" autocomplete="off" placeholder="build.yml atau deploy.yml" />
+            </div>
+          </div>
+          <label class="github-checkbox"><input id="githubAutoUpload" type="checkbox" checked /><span>Upload otomatis sesudah konversi berhasil (bila semua konfigurasi terisi).</span></label>
+          <label class="github-checkbox"><input id="githubAutoOpenUrl" type="checkbox" checked /><span>Buka URL HTTPS raw secara otomatis setelah upload berhasil.</span></label>
+          <label class="github-checkbox"><input id="githubAutoBuild" type="checkbox" checked /><span>Trigger workflow build khusus jika nama workflow diisi (workflow harus mendukung <code>workflow_dispatch</code>).</span></label>
+          <div class="github-actions">
+            <button class="icon-button" id="githubUploadBtn" type="button" title="Upload kode yang sedang tampil ke GitHub">Upload ke GitHub sekarang</button>
+            <button class="icon-button" id="githubCopyUrlBtn" type="button" title="Salin URL hasil upload" disabled>Salin URL</button>
+          </div>
+          <p class="github-security">Keamanan: token hanya dipakai selama halaman ini terbuka dan tidak disimpan ke localStorage. Gunakan token fine-grained yang dibatasi ke satu repo. Izin minimum upload: <strong>Contents: Read and write</strong>. Untuk trigger workflow khusus, tambahkan <strong>Actions: Write</strong>. Jangan bagikan token ke siapa pun.</p>
+          <div class="github-result" id="githubResult" aria-live="polite">
+            <div class="github-result-title">Hasil sudah di-upload</div>
+            <a id="githubFileUrl" href="#" target="_blank" rel="noopener noreferrer">Buka file di GitHub</a>
+            <a class="raw-url" id="githubRawUrl" href="#" target="_blank" rel="noopener noreferrer">Buka raw HTTPS URL</a>
+            <a class="raw-url" id="githubActionsUrl" href="#" target="_blank" rel="noopener noreferrer">Buka GitHub Actions / build</a>
+            <div class="github-commit" id="githubBuildStatus">Build: menunggu upload.</div>
+            <div class="github-commit" id="githubCommit"></div>
+            <div class="github-runner" id="githubRunnerPanel" style="display:none">
+              <div class="github-runner-title">Runner Script · jalankan file Lua yang sudah di-upload</div>
+              <p class="github-runner-help">Salin script ini ke Roblox Studio sebagai <strong>Script</strong> di <code>ServerScriptService</code>. Aktifkan <em>Allow HTTP Requests</em> di Game Settings → Security, dan aktifkan <code>ServerScriptService.LoadStringEnabled</code> di Studio. Loader ini memerlukan repository publik, menjalankan kode dari URL GitHub, dan tidak menyimpan token GitHub. Jalankan hanya kode yang kamu percaya.</p>
+              <textarea id="githubRunnerOutput" rows="12" readonly spellcheck="false" aria-label="Generated Roblox Lua runner script"></textarea>
+              <div class="github-runner-actions">
+                <button class="icon-button" id="githubCopyRunnerBtn" type="button">Salin Runner Script</button>
+                <button class="icon-button" id="githubDownloadRunnerBtn" type="button">Download runner.lua</button>
+              </div>
+            </div>
+          </div>
+        </section>
       </section>
     </section>
 
@@ -319,7 +410,11 @@
       let convertedOutput = '-- Import file .rbxm/.rbxl atau .rbxmx/.rbxlx lalu klik Convert to Luau.\n-- Hasil akan muncul di sini.';
       let activeOutput = 'builtin';
       let toastTimer = null;
+      let editorMetaTimer = null;
       let lastSuggestedName = 'converted_model.lua';
+      let lastUploadedUrl = '';
+      let lastUploadedRawUrl = '';
+      let hasSuccessfulConversion = false;
 
       codeEditor.value = BUILTIN_OUTPUT;
       updateEditorMeta();
@@ -506,15 +601,162 @@
       };
       let binaryParserPromise = null;
 
+      function decompressLz4Block(source, expectedLength) {
+        const output = new Uint8Array(expectedLength);
+        let sourceIndex = 0;
+        let outputIndex = 0;
+
+        while (sourceIndex < source.length) {
+          const token = source[sourceIndex++];
+          let literalLength = token >>> 4;
+          if (literalLength === 15) {
+            let extension;
+            do {
+              if (sourceIndex >= source.length) throw new Error('Blok LZ4 terpotong saat membaca panjang literal.');
+              extension = source[sourceIndex++];
+              literalLength += extension;
+            } while (extension === 255);
+          }
+
+          if (sourceIndex + literalLength > source.length || outputIndex + literalLength > output.length) {
+            throw new Error('Blok LZ4 memiliki panjang literal yang tidak valid.');
+          }
+          output.set(source.subarray(sourceIndex, sourceIndex + literalLength), outputIndex);
+          sourceIndex += literalLength;
+          outputIndex += literalLength;
+
+          if (sourceIndex >= source.length) break;
+          if (sourceIndex + 2 > source.length) throw new Error('Blok LZ4 terpotong saat membaca offset.');
+
+          const matchOffset = source[sourceIndex] | (source[sourceIndex + 1] << 8);
+          sourceIndex += 2;
+          if (matchOffset === 0 || matchOffset > outputIndex) throw new Error('Offset blok LZ4 tidak valid.');
+
+          let matchLength = token & 0x0f;
+          if (matchLength === 15) {
+            let extension;
+            do {
+              if (sourceIndex >= source.length) throw new Error('Blok LZ4 terpotong saat membaca panjang match.');
+              extension = source[sourceIndex++];
+              matchLength += extension;
+            } while (extension === 255);
+          }
+          matchLength += 4;
+          if (outputIndex + matchLength > output.length) throw new Error('Hasil dekompresi LZ4 melebihi panjang yang ditentukan.');
+
+          if (matchOffset >= matchLength) {
+            output.set(output.subarray(outputIndex - matchOffset, outputIndex - matchOffset + matchLength), outputIndex);
+          } else {
+            for (let i = 0; i < matchLength; i++) {
+              output[outputIndex + i] = output[outputIndex + i - matchOffset];
+            }
+          }
+          outputIndex += matchLength;
+        }
+
+        if (outputIndex !== expectedLength) {
+          throw new Error(`Panjang hasil dekompresi LZ4 tidak cocok (${outputIndex}/${expectedLength} byte).`);
+        }
+        return output;
+      }
+
+      const ROBLOX_BINARY_SIGNATURE = [0x3c, 0x72, 0x6f, 0x62, 0x6c, 0x6f, 0x78, 0x21, 0x89, 0xff, 0x0d, 0x0a, 0x1a, 0x0a];
+
+      function normalizeBinaryLz4Chunks(inputBytes) {
+        const bytes = inputBytes instanceof Uint8Array ? inputBytes : new Uint8Array(inputBytes);
+        if (bytes.length < 32) return bytes;
+        for (let i = 0; i < ROBLOX_BINARY_SIGNATURE.length; i++) {
+          if (bytes[i] !== ROBLOX_BINARY_SIGNATURE[i]) return bytes;
+        }
+
+        const view = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength);
+        const parts = [bytes.subarray(0, 32)];
+        let totalLength = 32;
+        let offset = 32;
+        let foundEnd = false;
+
+        while (offset + 16 <= bytes.length) {
+          const headerOffset = offset;
+          const header = bytes.subarray(headerOffset, headerOffset + 16);
+          const chunkType = String.fromCharCode(bytes[headerOffset], bytes[headerOffset + 1], bytes[headerOffset + 2], bytes[headerOffset + 3]);
+          const compressedLength = view.getUint32(headerOffset + 4, true);
+          const uncompressedLength = view.getUint32(headerOffset + 8, true);
+          offset += 16;
+
+          if (chunkType === 'END\0') {
+            parts.push(header);
+            totalLength += 16;
+            foundEnd = true;
+            break;
+          }
+
+          const payloadLength = compressedLength === 0 ? uncompressedLength : compressedLength;
+          if (offset + payloadLength > bytes.length) {
+            throw new Error(`Chunk ${chunkType} terpotong atau memiliki panjang yang tidak valid.`);
+          }
+          const payload = bytes.subarray(offset, offset + payloadLength);
+          offset += payloadLength;
+
+          const isZstandard = compressedLength > 0 && payload.length >= 4 &&
+            payload[0] === 0x28 && payload[1] === 0xb5 && payload[2] === 0x2f && payload[3] === 0xfd;
+          if (compressedLength > 0 && !isZstandard) {
+            const decompressed = decompressLz4Block(payload, uncompressedLength);
+            const normalizedHeader = header.slice();
+            new DataView(normalizedHeader.buffer, normalizedHeader.byteOffset, normalizedHeader.byteLength).setUint32(4, 0, true);
+            parts.push(normalizedHeader, decompressed);
+            totalLength += 16 + decompressed.length;
+          } else {
+            parts.push(header, payload);
+            totalLength += 16 + payload.length;
+          }
+        }
+
+        if (!foundEnd) throw new Error('Chunk penutup END\0 tidak ditemukan pada file biner.');
+        const normalized = new Uint8Array(totalLength);
+        let writeOffset = 0;
+        for (const part of parts) {
+          normalized.set(part, writeOffset);
+          writeOffset += part.length;
+        }
+        return normalized;
+      }
+
       async function getBinaryParser() {
         if (!binaryParserPromise) {
           binaryParserPromise = (async () => {
-            // Buffer polyfill is needed by the parser's dependency graph in browser contexts.
-            if (!globalThis.Buffer) {
-              const bufferModule = await import('https://esm.sh/buffer@6.0.3');
-              globalThis.Buffer = bufferModule.Buffer || (bufferModule.default && bufferModule.default.Buffer);
+            // Share the Buffer polyfill with the parser and add Node's alternate BigUint method names.
+            const bufferModule = await import('https://esm.sh/buffer@6.0.3');
+            const BufferPolyfill = bufferModule.Buffer || (bufferModule.default && bufferModule.default.Buffer);
+            if (!BufferPolyfill || !BufferPolyfill.prototype) {
+              throw new Error('Buffer polyfill tidak menyediakan constructor yang valid.');
             }
-            return import('https://esm.sh/rbxm-parser@1.1.4?bundle');
+
+            const bufferPrototype = BufferPolyfill.prototype;
+            if (typeof bufferPrototype.readBigUint64BE !== 'function') {
+              if (typeof bufferPrototype.readBigUInt64BE === 'function') {
+                bufferPrototype.readBigUint64BE = bufferPrototype.readBigUInt64BE;
+              } else if (typeof bufferPrototype.readUInt32BE === 'function' && typeof BigInt === 'function') {
+                bufferPrototype.readBigUint64BE = function(offset = 0) {
+                  const high = BigInt(this.readUInt32BE(offset));
+                  const low = BigInt(this.readUInt32BE(offset + 4));
+                  return (high << BigInt(32)) | low;
+                };
+              }
+            }
+            if (typeof bufferPrototype.readBigUint64LE !== 'function') {
+              if (typeof bufferPrototype.readBigUInt64LE === 'function') {
+                bufferPrototype.readBigUint64LE = bufferPrototype.readBigUInt64LE;
+              } else if (typeof bufferPrototype.readUInt32LE === 'function' && typeof BigInt === 'function') {
+                bufferPrototype.readBigUint64LE = function(offset = 0) {
+                  const low = BigInt(this.readUInt32LE(offset));
+                  const high = BigInt(this.readUInt32LE(offset + 4));
+                  return low | (high << BigInt(32));
+                };
+              }
+            }
+
+            if (!globalThis.Buffer) globalThis.Buffer = BufferPolyfill;
+            return import('https://esm.sh/rbxm-parser@1.1.4?bundle=false');
           })().catch(error => {
             binaryParserPromise = null;
             throw new Error('Tidak bisa memuat parser biner. Periksa koneksi internet lalu coba lagi. Detail: ' + (error && error.message ? error.message : 'CDN tidak tersedia'));
@@ -626,7 +868,8 @@
         }
         let parsedFile;
         try {
-          parsedFile = RobloxFile.ReadFromBuffer(bytes);
+          // Expand LZ4 chunks locally to avoid browser CDN interop issues in the parser's LZ4 dependency.
+          parsedFile = RobloxFile.ReadFromBuffer(normalizeBinaryLz4Chunks(bytes));
         } catch (error) {
           throw new Error('Parser biner gagal membaca file: ' + (error && error.message ? error.message : 'header/chunk tidak valid'));
         }
@@ -635,35 +878,56 @@
         }
 
         const extension = String(filename || '').split('.').pop().toLowerCase();
-        const roots = Array.from(parsedFile.Roots || []);
+        const roots = parsedFile.Roots;
         // An .rbxl is a place file: import objects under Workspace instead of trying to instantiate services.
         let selectedRoots = roots;
         if (extension === 'rbxl') {
           const workspaceRoot = roots.find(root => root && root.ClassName === 'Workspace');
           if (!workspaceRoot) throw new Error('File .rbxl berhasil dibuka, tetapi service Workspace tidak ditemukan. Coba ekspor model dari Workspace sebagai .rbxm.');
-          selectedRoots = Array.from(workspaceRoot.Children || []);
+          selectedRoots = Array.isArray(workspaceRoot.Children) ? workspaceRoot.Children : Array.from(workspaceRoot.Children || []);
         }
 
         const nodes = [];
-        function collect(instance, parentIndex = null) {
-          if (!instance || BINARY_IGNORED_CLASSES.has(instance.ClassName)) return null;
+        const classes = Object.create(null);
+        let rootCount = 0;
+        const stack = [];
+        for (let i = selectedRoots.length - 1; i >= 0; i--) {
+          stack.push({ instance: selectedRoots[i], parentIndex: null, topLevel: true });
+        }
+        while (stack.length) {
+          const entry = stack.pop();
+          const instance = entry.instance;
+          if (!instance || BINARY_IGNORED_CLASSES.has(instance.ClassName)) continue;
+
           const className = String(instance.ClassName || 'Folder');
           const objectName = String(instance.Name || className);
+          const props = instance.Props instanceof Map ? instance.Props : null;
           const index = nodes.length;
           const node = {
             instance, className, objectName, variable: 'obj' + (index + 1),
-            parentIndex, children: [], properties: instance.Props instanceof Map ? Array.from(instance.Props.entries()) : []
+            parentIndex: entry.parentIndex, properties: props,
+            hasNameProperty: !!(props && props.has('Name'))
           };
           nodes.push(node);
-          if (parentIndex !== null) nodes[parentIndex].children.push(index);
-          const children = Array.from(instance.Children || []);
-          for (const child of children) collect(child, index);
-          return index;
+          classes[className] = (classes[className] || 0) + 1;
+          if (entry.topLevel) rootCount++;
+
+          const children = instance.Children;
+          if (Array.isArray(children)) {
+            for (let i = children.length - 1; i >= 0; i--) {
+              stack.push({ instance: children[i], parentIndex: index, topLevel: false });
+            }
+          } else if (children && typeof children[Symbol.iterator] === 'function') {
+            const childList = Array.from(children);
+            for (let i = childList.length - 1; i >= 0; i--) {
+              stack.push({ instance: childList[i], parentIndex: index, topLevel: false });
+            }
+          }
         }
-        const topIndexes = selectedRoots.map(root => collect(root, null)).filter(index => index !== null);
         if (!nodes.length) throw new Error('Tidak ada objek model yang tersisa setelah Script/LocalScript/ModuleScript dilewati.');
 
-        const instanceVars = new Map(nodes.map(node => [node.instance, node.variable]));
+        const instanceVars = new Map();
+        for (const node of nodes) instanceVars.set(node.instance, node.variable);
         const notes = new Set();
         const baseName = String(filename || 'ImportedModel').replace(/\.[^.]+$/, '').trim() || 'ImportedModel';
         const lines = [
@@ -686,10 +950,10 @@
         for (const node of nodes) lines.push(`local ${node.variable} = Instance.new(${escapeLuaString(node.className)})`);
         lines.push('');
         for (const node of nodes) {
-          if (node.objectName !== node.className || node.properties.some(([key]) => key === 'Name')) {
+          if (node.objectName !== node.className || node.hasNameProperty) {
             lines.push(`${node.variable}.Name = ${escapeLuaString(node.objectName)}`);
           }
-          for (const [propertyName, typedProperty] of node.properties) {
+          if (node.properties) for (const [propertyName, typedProperty] of node.properties) {
             if (propertyName === 'Name' || BINARY_IGNORED_PROPS.has(propertyName)) continue;
             const valueExpression = binaryLuaPropertyValue(propertyName, typedProperty, instanceVars, notes);
             if (valueExpression !== null) lines.push(`${node.variable}.${propertyName} = ${valueExpression}`);
@@ -704,19 +968,22 @@
           for (const note of notes) lines.push('-- ' + note);
         }
         return {
-          code: lines.join('\n').replace(/\n{3,}/g, '\n\n'),
+          code: lines.join('\n'),
           count: nodes.length,
-          roots: topIndexes.length,
+          roots: rootCount,
           notes: Array.from(notes),
-          classes: nodes.reduce((acc, node) => { acc[node.className] = (acc[node.className] || 0) + 1; return acc; }, {})
+          classes
         };
       }
 
       function convertRobloxXml(xmlText, filename) {
-        let normalizedXml = String(xmlText || '').replace(/^\uFEFF/, '');
-        // Some third-party XML exporters leave XML-illegal control bytes or bare ampersands in text.
-        normalizedXml = normalizedXml.replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F]/g, '');
-        normalizedXml = normalizedXml.replace(/&(?!#\d+;|#x[0-9a-f]+;|[a-zA-Z][\w.-]*;)/g, '&amp;');
+        let normalizedXml = String(xmlText || '');
+        if (normalizedXml.charCodeAt(0) === 0xFEFF) normalizedXml = normalizedXml.slice(1);
+        // Avoid allocating replacement strings for valid XML; some third-party exporters leave control bytes or bare ampersands.
+        const illegalXmlControl = /[\u0000-\u0008\u000B\u000C\u000E-\u001F]/;
+        const bareAmpersand = /&(?!#\d+;|#x[0-9a-f]+;|[a-zA-Z][\w.-]*;)/;
+        if (illegalXmlControl.test(normalizedXml)) normalizedXml = normalizedXml.replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F]/g, '');
+        if (bareAmpersand.test(normalizedXml)) normalizedXml = normalizedXml.replace(/&(?!#\d+;|#x[0-9a-f]+;|[a-zA-Z][\w.-]*;)/g, '&amp;');
         const parser = new DOMParser();
         const doc = parser.parseFromString(normalizedXml, 'application/xml');
         const parseError = doc.getElementsByTagName('parsererror')[0];
@@ -731,23 +998,49 @@
 
         const nodes = [];
         const refMap = new Map();
-        function collect(element, parentIndex = null) {
+        const classes = Object.create(null);
+        let rootCount = 0;
+        const stack = [];
+        for (let i = rootItems.length - 1; i >= 0; i--) {
+          stack.push({ element: rootItems[i], parentIndex: null, topLevel: true });
+        }
+        while (stack.length) {
+          const entry = stack.pop();
+          const element = entry.element;
           const className = element.getAttribute('class') || 'Folder';
-          if (['Script', 'LocalScript', 'ModuleScript'].includes(className)) return null;
-          const properties = directChild(element, 'Properties');
-          const nameProperty = properties ? Array.from(properties.children).find(p => p.getAttribute('name') === 'Name') : null;
+          if (['Script', 'LocalScript', 'ModuleScript'].includes(className)) continue;
+
+          const propertiesElement = directChild(element, 'Properties');
+          let nameProperty = null;
+          if (propertiesElement) {
+            for (const property of propertiesElement.children) {
+              if (property.getAttribute('name') === 'Name') {
+                nameProperty = property;
+                break;
+              }
+            }
+          }
           let objectName = nameProperty ? nameProperty.textContent : className;
           if (!objectName.trim()) objectName = className;
-          const idx = nodes.length + 1;
-          const variable = 'obj' + idx;
-          const record = { element, className, objectName, variable, parentIndex, children: [], properties: properties ? Array.from(properties.children) : [], referent: element.getAttribute('referent') };
-          nodes.push(record);
-          if (record.referent) refMap.set(record.referent, variable);
-          if (parentIndex !== null) nodes[parentIndex].children.push(idx - 1);
-          for (const child of Array.from(element.children).filter(el => (el.localName || el.tagName) === 'Item' && !['Script', 'LocalScript', 'ModuleScript'].includes(el.getAttribute('class')))) collect(child, idx - 1);
-          return idx - 1;
+          const index = nodes.length;
+          const variable = 'obj' + (index + 1);
+          const referent = element.getAttribute('referent');
+          nodes.push({ element, className, objectName, variable, parentIndex: entry.parentIndex, propertiesElement, hasNameProperty: !!nameProperty, referent });
+          classes[className] = (classes[className] || 0) + 1;
+          if (referent) refMap.set(referent, variable);
+          if (entry.topLevel) rootCount++;
+
+          const children = element.children;
+          for (let i = children.length - 1; i >= 0; i--) {
+            const child = children[i];
+            if ((child.localName || child.tagName) === 'Item') {
+              const childClass = child.getAttribute('class');
+              if (!['Script', 'LocalScript', 'ModuleScript'].includes(childClass)) {
+                stack.push({ element: child, parentIndex: index, topLevel: false });
+              }
+            }
+          }
         }
-        const topIndexes = rootItems.map(item => collect(item, null)).filter(index => index !== null);
         const notes = new Set();
         const baseName = String(filename || 'ImportedModel').replace(/\.[^.]+$/, '');
         const modelName = baseName.trim() || 'ImportedModel';
@@ -772,12 +1065,15 @@
         }
         lines.push('');
         for (const node of nodes) {
-          const properties = node.properties.filter(p => p.getAttribute('name') !== 'Name');
-          if (node.objectName !== node.className || node.properties.some(p => p.getAttribute('name') === 'Name')) {
+          if (node.objectName !== node.className || node.hasNameProperty) {
             lines.push(`${node.variable}.Name = ${escapeLuaString(node.objectName)}`);
           }
-          for (const prop of properties) {
-            lines.push(...convertProperty(prop, node.variable, refMap, notes));
+          if (node.propertiesElement) {
+            for (const prop of node.propertiesElement.children) {
+              if (prop.getAttribute('name') === 'Name') continue;
+              const convertedProperties = convertProperty(prop, node.variable, refMap, notes);
+              for (const line of convertedProperties) lines.push(line);
+            }
           }
           if (node.parentIndex !== null) lines.push(`${node.variable}.Parent = ${nodes[node.parentIndex].variable}`);
           else lines.push(`${node.variable}.Parent = importedModel`);
@@ -788,7 +1084,7 @@
           lines.push('', '-- Conversion notes:');
           for (const note of notes) lines.push('-- ' + note);
         }
-        return { code: lines.join('\n').replace(/\n{3,}/g, '\n\n'), count: nodes.length, roots: topIndexes.length, notes: Array.from(notes), classes: nodes.reduce((acc, n) => { acc[n.className] = (acc[n.className] || 0) + 1; return acc; }, {}) };
+        return { code: lines.join('\n'), count: nodes.length, roots: rootCount, notes: Array.from(notes), classes };
       }
 
       function bytesLabel(size) {
@@ -810,8 +1106,25 @@
         $('statusText').textContent = message;
       }
 
+      function updateLineCount() {
+        const value = codeEditor.value;
+        let lines = 1;
+        for (let i = 0; i < value.length; i++) {
+          if (value.charCodeAt(i) === 10) lines++;
+        }
+        $('lineCount').textContent = lines + ' lines';
+      }
+
+      function scheduleLineCountUpdate() {
+        if (editorMetaTimer) clearTimeout(editorMetaTimer);
+        editorMetaTimer = setTimeout(() => {
+          editorMetaTimer = null;
+          updateLineCount();
+        }, 180);
+      }
+
       function updateEditorMeta() {
-        $('lineCount').textContent = codeEditor.value.split('\n').length + ' lines';
+        updateLineCount();
         $('editorHint').textContent = activeOutput === 'builtin' ? 'Kode dapat diedit' : 'Output konversi · dapat diedit';
         $('editorLabel').textContent = activeOutput === 'builtin' ? 'studio_gui_visibility.lua' : lastSuggestedName;
       }
@@ -835,6 +1148,7 @@
 
       async function acceptFile(file) {
         if (!file) return;
+        hasSuccessfulConversion = false;
         currentFile = file;
         $('fileCard').classList.add('visible');
         $('fileName').textContent = file.name;
@@ -896,6 +1210,7 @@
           return;
         }
         try {
+          hasSuccessfulConversion = false;
           setStatus('Memproses model...', 'warning');
           const result = window.__rbxInputFormat === 'binary'
             ? await convertRobloxBinary(window.__rbxBinaryData, currentFile.name)
@@ -906,9 +1221,17 @@
           const classSummary = Object.entries(result.classes).slice(0, 4).map(([k,v]) => `${k} ×${v}`).join(', ');
           $('conversionStats').textContent = `${result.count} Instance dibaca · ${result.roots} objek akar · ${result.notes.length} catatan. ${classSummary}${Object.keys(result.classes).length > 4 ? ', …' : ''}`;
           lastSuggestedName = currentFile.name.replace(/\.[^.]+$/, '') + '.lua';
+          hasSuccessfulConversion = true;
+          if (!$('githubPath').value.trim()) $('githubPath').value = 'converted/' + lastSuggestedName;
           updateEditorMeta();
-          notify(`Konversi selesai: ${result.count} Instance diproses.`);
+          if ($('githubAutoUpload').checked && isGitHubConfigured()) {
+            notify(`Konversi selesai (${result.count} Instance). Mengunggah hasil ke GitHub...`);
+            await uploadCurrentToGitHub({ automatic: true });
+          } else {
+            notify(`Konversi selesai: ${result.count} Instance diproses.`);
+          }
         } catch (error) {
+          hasSuccessfulConversion = false;
           convertedOutput = '-- Konversi gagal.\n-- ' + String(error.message || error).replace(/\n/g, ' ');
           switchOutput('converted');
           setStatus('Konversi gagal', 'error');
@@ -917,7 +1240,300 @@
         }
       }
 
+      function isGitHubConfigured() {
+        return Boolean(
+          $('githubOwner').value.trim() &&
+          $('githubRepo').value.trim() &&
+          $('githubBranch').value.trim() &&
+          $('githubPath').value.trim() &&
+          $('githubToken').value.trim()
+        );
+      }
+
+      function encodeBase64Utf8(value) {
+        const bytes = new TextEncoder().encode(value);
+        let binary = '';
+        const chunkSize = 0x8000;
+        for (let i = 0; i < bytes.length; i += chunkSize) {
+          binary += String.fromCharCode(...bytes.subarray(i, i + chunkSize));
+        }
+        return btoa(binary);
+      }
+
+      function makeGitHubRunnerScript(sourceUrl) {
+        const safeUrl = JSON.stringify(sourceUrl);
+        return `-- Generated by RBX -> Lua Converter.
+-- Place this Script inside ServerScriptService in Roblox Studio.
+-- Enable Game Settings > Security > Allow HTTP Requests.
+-- In Studio, enable ServerScriptService.LoadStringEnabled (disabled by default).
+-- SECURITY: this downloads and executes remote code. Use only a source you own and have reviewed.
+
+local HttpService = game:GetService("HttpService")
+local SOURCE_URL = ${safeUrl}
+
+local downloadOk, sourceOrError = pcall(function()
+    return HttpService:GetAsync(SOURCE_URL, true)
+end)
+
+if not downloadOk then
+    error("[GitHub Loader] Failed to download uploaded Lua: " .. tostring(sourceOrError))
+end
+
+local source = sourceOrError
+if type(source) ~= "string" or source == "" then
+    error("[GitHub Loader] The downloaded Lua source is empty or invalid.")
+end
+
+local chunk, compileError = loadstring(source, "@GitHubUploadedLua")
+if not chunk then
+    error("[GitHub Loader] Lua compile error: " .. tostring(compileError))
+end
+
+local runOk, runError = pcall(chunk)
+if not runOk then
+    error("[GitHub Loader] Uploaded Lua raised an error: " .. tostring(runError))
+end
+`;
+      }
+
+      function showGitHubResult(fileUrl, rawUrl, actionsUrl, commitSha, runnerUrl) {
+        // The copy-URL action copies the raw HTTPS endpoint of the converted Lua file.
+        lastUploadedUrl = rawUrl;
+        lastUploadedRawUrl = rawUrl;
+        $('githubFileUrl').href = fileUrl;
+        $('githubFileUrl').textContent = 'File di GitHub: ' + fileUrl;
+        $('githubRawUrl').href = rawUrl;
+        $('githubRawUrl').textContent = 'HTTPS Raw URL: ' + rawUrl;
+        $('githubActionsUrl').href = actionsUrl;
+        $('githubActionsUrl').textContent = 'GitHub Actions / Build: ' + actionsUrl;
+        $('githubBuildStatus').textContent = 'Build: commit sudah dikirim. Workflow dengan trigger push berjalan otomatis jika sudah dikonfigurasi.';
+        $('githubCommit').textContent = commitSha ? 'Commit: ' + commitSha : '';
+        $('githubRunnerOutput').value = makeGitHubRunnerScript(runnerUrl || rawUrl);
+        $('githubRunnerPanel').style.display = 'block';
+        $('githubResult').classList.add('visible');
+        $('githubCopyUrlBtn').disabled = false;
+      }
+
+      async function triggerGitHubBuild(owner, repo, branch, workflowFile, headers) {
+        const cleanWorkflow = workflowFile.trim();
+        if (!cleanWorkflow) return { triggered: false, reason: 'Workflow tidak diisi; mengandalkan workflow dengan trigger push.' };
+        if (cleanWorkflow.includes('/') || cleanWorkflow.includes('..') || !/^[A-Za-z0-9_.-]+$/.test(cleanWorkflow)) {
+          throw new Error('Nama workflow harus nama file seperti build.yml, bukan path folder.');
+        }
+        const dispatchUrl = `https://api.github.com/repos/${encodeURIComponent(owner)}/${encodeURIComponent(repo)}/actions/workflows/${encodeURIComponent(cleanWorkflow)}/dispatches?return_run_details=true`;
+        const response = await fetch(dispatchUrl, {
+          method: 'POST',
+          headers,
+          body: JSON.stringify({ ref: branch })
+        });
+        if (!response.ok) {
+          const detail = await response.json().catch(() => ({}));
+          const message = detail && detail.message ? detail.message : `HTTP ${response.status}`;
+          if (response.status === 403 || response.status === 401) {
+            throw new Error(message + ' — untuk workflow_dispatch, token perlu izin Actions: Write dan workflow harus memiliki pemicu workflow_dispatch.');
+          }
+          throw new Error(message + ' — pastikan file workflow ada di .github/workflows/ dan mendukung workflow_dispatch.');
+        }
+        const data = await response.json().catch(() => ({}));
+        return { triggered: true, url: data.html_url || `https://github.com/${encodeURIComponent(owner)}/${encodeURIComponent(repo)}/actions` };
+      }
+
+      async function uploadCurrentToGitHub(options = {}) {
+        const automatic = Boolean(options.automatic);
+        if (!isGitHubConfigured()) {
+          const message = 'Lengkapi owner, repository, branch, path, dan token GitHub dulu.';
+          if (!automatic) notify(message);
+          setStatus('Konfigurasi GitHub belum lengkap', 'warning');
+          return false;
+        }
+
+        const owner = $('githubOwner').value.trim();
+        const repo = $('githubRepo').value.trim();
+        const branch = $('githubBranch').value.trim();
+        let path = $('githubPath').value.trim().replace(/^\/+/, '');
+        const token = $('githubToken').value.trim();
+        if (!/^[A-Za-z0-9_.-]+$/.test(owner) || !/^[A-Za-z0-9_.-]+$/.test(repo) || owner === '.' || owner === '..' || repo === '.' || repo === '..') {
+          notify('Owner atau nama repository tidak valid.');
+          setStatus('Konfigurasi GitHub tidak valid', 'error');
+          return false;
+        }
+        if (!path || path.split('/').some(part => !part || part === '.' || part === '..') || path.endsWith('/')) {
+          notify('Path harus berupa nama file, misalnya converted/hasil.lua.');
+          setStatus('Path GitHub tidak valid', 'error');
+          return false;
+        }
+        if (!branch || /[\s~^:?*\[\]\\]/.test(branch)) {
+          notify('Nama branch tidak valid.');
+          setStatus('Branch GitHub tidak valid', 'error');
+          return false;
+        }
+        if (!hasSuccessfulConversion) {
+          notify('Konversi model harus berhasil dulu sebelum hasil bisa di-upload.');
+          setStatus('Belum ada hasil konversi untuk di-upload', 'warning');
+          return false;
+        }
+        const code = convertedOutput;
+        if (!code.trim()) {
+          notify('Tidak ada kode untuk di-upload.');
+          return false;
+        }
+        if (!/\.lua$/i.test(path)) path += '.lua';
+
+        const apiUrl = `https://api.github.com/repos/${encodeURIComponent(owner)}/${encodeURIComponent(repo)}/contents/${path.split('/').map(encodeURIComponent).join('/')}`;
+        const headers = {
+          'Accept': 'application/vnd.github+json',
+          'Authorization': 'Bearer ' + token,
+          'X-GitHub-Api-Version': '2022-11-28',
+          'Content-Type': 'application/json'
+        };
+        const payload = {
+          message: `Upload converted Lua: ${path.split('/').pop()}`,
+          content: encodeBase64Utf8(code),
+          branch
+        };
+
+        try {
+          setStatus('Mengunggah hasil ke GitHub...', 'warning');
+          $('githubUploadBtn').disabled = true;
+          let existingSha = null;
+          const getResponse = await fetch(apiUrl + '?ref=' + encodeURIComponent(branch), { method: 'GET', headers });
+          if (getResponse.ok) {
+            const existing = await getResponse.json();
+            existingSha = existing && existing.sha ? existing.sha : null;
+          } else if (getResponse.status !== 404) {
+            const detail = await getResponse.json().catch(() => ({}));
+            throw new Error(detail.message || `GitHub API gagal membaca file (HTTP ${getResponse.status}).`);
+          }
+          if (existingSha) payload.sha = existingSha;
+
+          const putResponse = await fetch(apiUrl, { method: 'PUT', headers, body: JSON.stringify(payload) });
+          const result = await putResponse.json().catch(() => ({}));
+          if (!putResponse.ok) {
+            let reason = result && result.message ? result.message : `HTTP ${putResponse.status}`;
+            if (putResponse.status === 401 || putResponse.status === 403) reason += ' — cek token dan izin Contents: Read and write.';
+            if (putResponse.status === 404) reason += ' — repo/branch tidak ditemukan atau token tidak punya akses.';
+            throw new Error(reason);
+          }
+          const encodedBranch = branch.split('/').map(encodeURIComponent).join('/');
+          const encodedPath = path.split('/').map(encodeURIComponent).join('/');
+          const fileUrl = `https://github.com/${encodeURIComponent(owner)}/${encodeURIComponent(repo)}/blob/${encodedBranch}/${encodedPath}`;
+          const rawUrl = `https://raw.githubusercontent.com/${encodeURIComponent(owner)}/${encodeURIComponent(repo)}/${encodedBranch}/${encodedPath}`;
+          const actionsUrl = `https://github.com/${encodeURIComponent(owner)}/${encodeURIComponent(repo)}/actions?query=${encodeURIComponent('branch:' + branch)}`;
+          const commitSha = result.commit && result.commit.sha ? result.commit.sha : '';
+          // Pin the runner to the exact upload commit so later branch changes don't silently change its source.
+          const runnerRef = commitSha || encodedBranch;
+          const runnerUrl = `https://raw.githubusercontent.com/${encodeURIComponent(owner)}/${encodeURIComponent(repo)}/${runnerRef}/${encodedPath}`;
+          showGitHubResult(fileUrl, rawUrl, actionsUrl, commitSha, runnerUrl);
+
+          // A contents commit automatically triggers existing workflows configured for `on: push`.
+          if ($('githubAutoBuild').checked && $('githubWorkflow').value.trim()) {
+            $('githubBuildStatus').textContent = 'Build: mengirim trigger workflow...';
+            try {
+              const build = await triggerGitHubBuild(owner, repo, branch, $('githubWorkflow').value, headers);
+              if (build.triggered && build.url) {
+                $('githubActionsUrl').href = build.url;
+                $('githubActionsUrl').textContent = 'Buka build run: ' + build.url;
+                $('githubBuildStatus').textContent = 'Build: trigger workflow berhasil dikirim. Proses build berjalan di GitHub Actions.';
+              }
+            } catch (buildError) {
+              $('githubBuildStatus').textContent = 'Upload sukses, trigger build khusus gagal: ' + String(buildError.message || buildError);
+              notify('Upload sukses, tetapi trigger build khusus gagal. Periksa status Build di panel GitHub.');
+            }
+          }
+
+          setStatus('Upload ke GitHub berhasil', 'success');
+          notify('Hasil Lua berhasil di-upload. URL HTTPS dan link build tersedia di panel GitHub.');
+          if ($('githubAutoOpenUrl').checked) {
+            // Opening after network requests can be blocked by popup protections; the link remains available below.
+            const opened = window.open(rawUrl, '_blank');
+            if (opened) opened.opener = null;
+            else notify('Browser memblokir tab otomatis. Klik link HTTPS Raw URL di panel GitHub.');
+          }
+          return true;
+        } catch (error) {
+          setStatus('Upload GitHub gagal', 'error');
+          notify('Upload gagal: ' + String(error.message || error));
+          return false;
+        } finally {
+          $('githubUploadBtn').disabled = false;
+        }
+      }
+
+      async function copyRunnerScript() {
+        const code = $('githubRunnerOutput').value;
+        if (!code.trim()) {
+          notify('Upload file Lua terlebih dahulu agar Runner Script dibuat.');
+          return;
+        }
+        try {
+          if (navigator.clipboard && window.isSecureContext) {
+            await navigator.clipboard.writeText(code);
+          } else {
+            const temp = document.createElement('textarea');
+            temp.value = code;
+            temp.setAttribute('readonly', '');
+            temp.style.position = 'fixed';
+            temp.style.opacity = '0';
+            document.body.appendChild(temp);
+            temp.select();
+            const ok = document.execCommand('copy');
+            temp.remove();
+            if (!ok) throw new Error('Clipboard tidak tersedia');
+          }
+          notify('Runner Script berhasil disalin.');
+        } catch (_) {
+          $('githubRunnerOutput').focus();
+          $('githubRunnerOutput').select();
+          notify('Clipboard tidak tersedia. Runner Script sudah dipilih untuk disalin manual.');
+        }
+      }
+
+      function downloadRunnerScript() {
+        const code = $('githubRunnerOutput').value;
+        if (!code.trim()) {
+          notify('Upload file Lua terlebih dahulu agar Runner Script dibuat.');
+          return;
+        }
+        const blob = new Blob([code], { type: 'text/plain;charset=utf-8' });
+        const url = URL.createObjectURL(blob);
+        const anchor = document.createElement('a');
+        anchor.href = url;
+        anchor.download = 'runner.lua';
+        document.body.appendChild(anchor);
+        anchor.click();
+        anchor.remove();
+        URL.revokeObjectURL(url);
+        notify('runner.lua berhasil disiapkan untuk diunduh.');
+      }
+
+      async function copyUploadedUrl() {
+        if (!lastUploadedUrl) {
+          notify('Upload hasil ke GitHub terlebih dahulu.');
+          return;
+        }
+        try {
+          if (navigator.clipboard && window.isSecureContext) {
+            await navigator.clipboard.writeText(lastUploadedUrl);
+          } else {
+            const temp = document.createElement('textarea');
+            temp.value = lastUploadedUrl;
+            temp.setAttribute('readonly', '');
+            temp.style.position = 'fixed';
+            temp.style.opacity = '0';
+            document.body.appendChild(temp);
+            temp.select();
+            const ok = document.execCommand('copy');
+            temp.remove();
+            if (!ok) throw new Error('Clipboard tidak tersedia');
+          }
+          notify('URL GitHub berhasil disalin.');
+        } catch (_) {
+          notify('Gagal menyalin URL otomatis. Buka link lalu salin dari address bar.');
+        }
+      }
+
       function clearFile() {
+        hasSuccessfulConversion = false;
         currentFile = null;
         window.__rbxXmlText = null;
         window.__rbxBinaryData = null;
@@ -966,12 +1582,16 @@
       $('removeFile').addEventListener('click', clearFile);
       $('copyBtn').addEventListener('click', copyCurrent);
       $('downloadBtn').addEventListener('click', downloadCurrent);
+      $('githubUploadBtn').addEventListener('click', () => uploadCurrentToGitHub());
+      $('githubCopyUrlBtn').addEventListener('click', copyUploadedUrl);
+      $('githubCopyRunnerBtn').addEventListener('click', copyRunnerScript);
+      $('githubDownloadRunnerBtn').addEventListener('click', downloadRunnerScript);
       convertedTab.addEventListener('click', () => switchOutput('converted'));
       builtinTab.addEventListener('click', () => switchOutput('builtin'));
       codeEditor.addEventListener('input', () => {
         if (activeOutput === 'builtin') window.__rbxBuiltInEdited = codeEditor.value;
         else convertedOutput = codeEditor.value;
-        updateEditorMeta();
+        scheduleLineCountUpdate();
       });
       $('sampleBtn').addEventListener('click', () => {
         const blob = new Blob([SAMPLE_XML], { type: 'application/xml' });
